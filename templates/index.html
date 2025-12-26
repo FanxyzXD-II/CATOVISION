@@ -32,8 +32,8 @@
 
 <div class="nav-bar">
     <div class="nav-item active" onclick="showTab('home')">🏠 Home</div>
-    <div class="nav-item" onclick="showTab('clear')">✨AI Clear Photo</div>
-    <div class="nav-item" onclick="showTab('dl')">🎬AI Downloader</div>
+    <div class="nav-item" onclick="showTab('clear')">✨ Clear Photo</div>
+    <div class="nav-item" onclick="showTab('dl')">🎬 Downloader</div>
 </div>
 
 <div class="container">
@@ -58,7 +58,7 @@
 
     <div id="clear" class="section">
         <div class="card">
-            <h2>✨ Photo Enhancer</h2>
+            <h2>✨ AI Photo Enhancer</h2>
             <p>Jernihkan foto kucingmu agar jadi HD</p>
             <form action="/enhance" method="post" enctype="multipart/form-data">
                 <input type="file" name="photo" accept="image/*" required>
@@ -69,7 +69,7 @@
 
     <div id="dl" class="section">
         <div class="card">
-            <h2>🎬 Media Downloader</h2>
+            <h2>🎬 AI Downloader</h2>
             <p>Download video/audio dari TikTok/YT</p>
             <form method="post" action="/download">
                 <input name="url" type="url" placeholder="Paste link video (YT/TikTok)" required>
@@ -92,5 +92,6 @@ function showTab(id) {
 </script>
 </body>
 </html>
+
 
 
