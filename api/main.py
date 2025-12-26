@@ -11,8 +11,8 @@ app = Flask(__name__, template_folder='../templates', static_folder='../static')
 def index():
     # Data gallery kucing (Pastikan file gambar ada di /static/uploads/)
     koleksi_kucing = [
-        {"id": 1, "name": "Classic Sketch", "img": "1000037411.jpg"},
-        {"id": 2, "name": "Meme King", "img": "1000037421.jpg"},
+        {"id": 1, "name": "green cat", "img": "1000037411.jpg"},
+        {"id": 2, "name": "turquoise cat", "img": "1000037421.jpg"},
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
@@ -65,3 +65,4 @@ def download_media():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
