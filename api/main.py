@@ -1,16 +1,24 @@
 import os
-import io
 import yt_dlp
-ydl_opts = {
-    'format': 'best',
-    'cookiefile': 'cookies.txt'
-    'cookiefile': str(cookie_path), 
-    'quiet': True,
-    'no_warnings': True,
-    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    # Jika masih error, Anda harus menambahkan file cookies.txt
-    # 'cookiefile': 'cookies.txt' 
-}
+from pathlib import Path
+
+# Mendapatkan lokasi file cookies secara otomatis
+base_path = Path(__file__).parent
+cookie_path = base_path / "cookies.txt"
+
+def download_video(url):
+    ydl_opts = {
+        'format': 'best',
+        'cookiefile': str(cookie_path), # Menggunakan cookies yang Anda buat
+        'quiet': True,
+        'no_warnings': True,
+        # Menggunakan User-Agent asli agar tidak dianggap bot
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        return ydl.download([url])
+
 from flask import Flask, render_template, request, send_file, Response
 from PIL import Image, ImageEnhance
 
@@ -75,6 +83,7 @@ def download_media():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
