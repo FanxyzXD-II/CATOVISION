@@ -1,10 +1,12 @@
 venv/
 cookies.txt
+COOKIES_CONTENT.
 python
 __pycache__/
 static/uploads/*
 *.pyc
 .env
+
 
 
 
