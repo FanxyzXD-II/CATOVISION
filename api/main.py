@@ -1,21 +1,22 @@
 import os
 import io
 import yt_dlp
-from pathlib import Path
-from flask import Flask, render_template, request, send_file, Response, redirect
+from flask import Flask, render_template, request, jsonify, send_file, redirect
+from PIL import Image, ImageEnhance
 
-# Inisialisasi: Sesuaikan folder jika main.py berada di dalam subfolder (seperti api/)
-# Jika main.py di root, cukup gunakan app = Flask(__name__)
+# Inisialisasi Flask
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 @app.route("/")
 def index():
+    # Data gallery kucing
     koleksi_kucing = [
         {"id": 1, "name": "green cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "turquoise cat", "img": "1000037421.jpg"},
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
+# --- FITUR ENHANCER (TIDAK DIHAPUS) ---
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
     if 'photo' not in request.files:
@@ -24,70 +25,75 @@ def enhance_photo():
     file = request.files['photo']
     img = Image.open(file.stream).convert("RGB")
     
+    # Logika Enhancer (Sharpen & Contrast)
     img = ImageEnhance.Sharpness(img).enhance(2.5)
     img = ImageEnhance.Contrast(img).enhance(1.4)
     
+    # Simpan ke memori (RAM) agar kompatibel dengan Vercel yang Read-Only
     img_io = io.BytesIO()
     img.save(img_io, 'JPEG', quality=95)
     img_io.seek(0)
     
     return send_file(img_io, mimetype='image/jpeg', as_attachment=True, download_name="CATO_HD.jpg")
 
-@app.route("/download", methods=["POST"])
-def download_media():
+# --- FITUR DOWNLOADER DENGAN PILIHAN RESOLUSI ---
+@app.route("/get-info", methods=["POST"])
+def get_info():
     url = request.form.get('url')
-    mode = request.form.get('mode')
-    
     if not url:
-        return "URL wajib diisi", 400
+        return jsonify({"error": "URL wajib diisi"}), 400
 
-    # Mengambil teks cookie dari settingan rahasia Vercel
-    cookies_data = os.getenv("COOKIES_CONTENT")
-    # Folder /tmp adalah satu-satunya tempat yang diizinkan Vercel untuk menulis file
+    cookies_content = os.getenv("COOKIES_CONTENT")
     cookie_path = "/tmp/cookies.txt"
-
-    if cookies_data:
+    if cookies_content:
         with open(cookie_path, "w") as f:
-            f.write(cookies_data)
-    
+            f.write(cookies_content)
+
     ydl_opts = {
-        # 'best' kadang gagal, 'bestvideo+bestaudio/best' lebih stabil
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        'cookiefile': cookie_path if cookies_content else None,
         'quiet': True,
         'no_warnings': True,
-        'cookiefile': cookie_path,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'nocheckcertificate': True,
     }
-
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # download=False wajib agar tidak kena error Read-Only
             info = ydl.extract_info(url, download=False)
+            formats_list = []
             
-            # Mencari URL download yang bisa langsung diakses
-            download_url = info.get('url')
+            for f in info.get('formats', []):
+                # Filter format yang sudah ada video + audio (siap download)
+                if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
+                    res = f.get('height')
+                    ext = f.get('ext')
+                    filesize = f.get('filesize')
+                    size_text = f"{round(filesize / (1024*1024), 1)} MB" if filesize else "Ukuran Tidak Diketahui"
+                    
+                    formats_list.append({
+                        'resolution': f"{res}p" if res else "N/A",
+                        'ext': ext,
+                        'size': size_text,
+                        'url': f.get('url')
+                    })
             
-            # Jika 'url' tidak ada di root, cari di daftar formats
-            if not download_url and 'formats' in info:
-                for f in info['formats']:
-                    if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
-                        download_url = f.get('url')
-                        break
+            # Ambil satu URL audio terbaik untuk opsi MP3
+            audio_url = None
+            for f in reversed(info.get('formats', [])):
+                if f.get('vcodec') == 'none' and f.get('acodec') != 'none':
+                    audio_url = f.get('url')
+                    break
 
-            if not download_url:
-                return "Format video tidak ditemukan atau tidak didukung", 404
-            
-            # Kirim user langsung ke file videonya
-            from flask import redirect
-            return redirect(download_url)
-            
+            # Urutkan resolusi dari tinggi ke rendah
+            formats_list.sort(key=lambda x: int(x['resolution'].replace('p','')) if 'p' in x['resolution'] else 0, reverse=True)
+
+            return jsonify({
+                "title": info.get('title', 'Video'),
+                "thumbnail": info.get('thumbnail'),
+                "formats": formats_list[:6], 
+                "audio_url": audio_url
+            })
     except Exception as e:
-        return f"Gagal memproses video: {str(e)}", 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
