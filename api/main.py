@@ -36,40 +36,38 @@ def enhance_photo():
 @app.route("/download", methods=["POST"])
 def download_media():
     url = request.form.get('url')
-    mode = request.form.get('mode') # 'video' atau 'audio'
+    mode = request.form.get('mode')
     
     if not url:
         return "URL wajib diisi", 400
 
-    # FIX: Path absolut yang dinamis untuk Vercel
-    base_path = Path(__file__).parent.resolve()
-    cookie_path = str(base_path / "cookies.txt")
+    # Mengambil teks cookie dari settingan rahasia Vercel
+    cookies_data = os.getenv("COOKIES_CONTENT")
+    # Folder /tmp adalah satu-satunya tempat yang diizinkan Vercel untuk menulis file
+    cookie_path = "/tmp/cookies.txt"
 
+    if cookies_data:
+        with open(cookie_path, "w") as f:
+            f.write(cookies_data)
+    
     ydl_opts = {
         'format': 'best' if mode == 'video' else 'bestaudio/best',
         'quiet': True,
         'no_warnings': True,
-        'cookiefile': cookie_path,
+        'cookiefile': cookie_path if cookies_data else None,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'nocheckcertificate': True, # Tambahan agar tidak error SSL di server
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # download=False sangat penting untuk Vercel (Read-Only)
             info = ydl.extract_info(url, download=False)
-            
-            # Ambil URL direct stream dari YouTube/Provider
             download_url = info.get('url') or info.get('formats')[0].get('url')
             
-            if not download_url:
-                return "Gagal mendapatkan URL stream", 500
-
-            # FIX: Gunakan redirect agar browser langsung mengunduh dari sumbernya
+            from flask import redirect
             return redirect(download_url)
-            
     except Exception as e:
         return f"Gagal memproses video: {str(e)}", 500
 
 if __name__ == "__main__":
     app.run(debug=True)
+
