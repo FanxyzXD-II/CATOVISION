@@ -4,19 +4,19 @@ import yt_dlp
 from flask import Flask, render_template, request, jsonify, send_file, redirect
 from PIL import Image, ImageEnhance
 
-# Inisialisasi Flask: Sesuaikan path jika file berada di folder api/
+# Inisialisasi Flask: Pastikan path template & static sesuai struktur folder Anda
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 @app.route("/")
 def index():
-    # Data gallery tetap dipertahankan
+    # Data gallery tetap dipertahankan sesuai tampilan asli
     koleksi_kucing = [
         {"id": 1, "name": "green cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "turquoise cat", "img": "1000037421.jpg"},
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
-# --- FITUR PHOTO ENHANCER ---
+# --- FITUR PHOTO ENHANCER (Tampilan Screenshot 1000050114.jpg) ---
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
     if 'photo' not in request.files:
@@ -25,7 +25,7 @@ def enhance_photo():
     file = request.files['photo']
     img = Image.open(file.stream).convert("RGB")
     
-    # Logika Enhancer asli
+    # Logika Enhancer asli Anda
     img = ImageEnhance.Sharpness(img).enhance(2.5)
     img = ImageEnhance.Contrast(img).enhance(1.4)
     
@@ -35,13 +35,14 @@ def enhance_photo():
     
     return send_file(img_io, mimetype='image/jpeg', as_attachment=True, download_name="CATO_HD.jpg")
 
-# --- FITUR DOWNLOADER (LOGIKA BARU) ---
+# --- FITUR DOWNLOADER (Fix Format Error 1000050260.jpg) ---
 @app.route("/get-info", methods=["POST"])
 def get_info():
     url = request.form.get('url')
     if not url:
         return jsonify({"error": "URL wajib diisi"}), 400
 
+    # Mengambil cookie dari Environment Variable (Aman & mendukung Vercel)
     cookies_content = os.getenv("COOKIES_CONTENT")
     cookie_path = "/tmp/cookies.txt"
     if cookies_content:
@@ -57,11 +58,12 @@ def get_info():
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # Ekstrak info tanpa download untuk mendapatkan daftar format tersedia
             info = ydl.extract_info(url, download=False)
             formats_list = []
             
             for f in info.get('formats', []):
-                # Filter format video yang sudah ada audionya (Direct Link)
+                # Filter format yang memiliki video dan audio (siap download langsung)
                 if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
                     res = f.get('height')
                     ext = f.get('ext')
@@ -75,7 +77,7 @@ def get_info():
                         'url': f.get('url')
                     })
             
-            # Format Audio untuk MP3
+            # Ambil satu stream audio saja untuk opsi MP3
             audio_url = None
             for f in reversed(info.get('formats', [])):
                 if f.get('vcodec') == 'none' and f.get('acodec') != 'none':
