@@ -5,53 +5,196 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CATON | Catovision AI</title>
   <style>
-    :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 50px; }
-    .nav-bar { display: flex; justify-content: center; gap: 15px; padding: 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-    .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: 0.3s; font-weight: bold; }
-    .nav-item.active { background: var(--accent); color: #020617; }
-    .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-    .section { display: none; animation: fadeIn 0.5s; }
-    .section.active { display: block; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; }
-    .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-    .cat-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-    .cat-card img { width: 100%; height: 150px; object-fit: cover; }
-    input, button { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-    button { background: var(--accent); color: #020617; font-weight: bold; border: none; cursor: pointer; }
-    .btn-tg { background: #24A1DE; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    :root { 
+        --bg:#020617; 
+        --card:#0f172a; 
+        --text:#f8fafc; 
+        --accent:#38bdf8; 
+        --border:#1e293b; 
+    }
+
+    /* Reset global agar padding tidak merusak lebar elemen */
+    * { 
+        box-sizing: border-box; 
+    }
+
+    body { 
+        background: var(--bg); 
+        color: var(--text); 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        margin: 0; 
+        padding-bottom: 50px; 
+    }
+
+    /* Navigasi diperbaiki: Bisa geser (scroll) jika layar sempit */
+    .nav-bar { 
+        display: flex; 
+        justify-content: flex-start; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+        gap: 12px; 
+        padding: 15px; 
+        background: var(--card); 
+        border-bottom: 1px solid var(--border); 
+        position: sticky; 
+        top: 0; 
+        z-index: 100;
+        scrollbar-width: none; /* Sembunyikan scrollbar Firefox */
+    }
+    .nav-bar::-webkit-scrollbar { 
+        display: none; /* Sembunyikan scrollbar Chrome/Safari */
+    }
+
+    .nav-item { 
+        cursor: pointer; 
+        padding: 10px 20px; 
+        border-radius: 14px; 
+        transition: 0.3s; 
+        font-weight: bold; 
+        flex-shrink: 0; /* Mencegah item menciut */
+        font-size: 14px;
+    }
+
+    .nav-item.active { 
+        background: var(--accent); 
+        color: #020617; 
+    }
+
+    .container { 
+        max-width: 800px; 
+        margin: 20px auto; 
+        padding: 0 15px; 
+    }
+
+    .section { 
+        display: none; 
+        animation: fadeIn 0.5s ease; 
+    }
+
+    .section.active { 
+        display: block; 
+    }
+
+    .card { 
+        background: var(--card); 
+        border: 1px solid var(--border); 
+        border-radius: 20px; 
+        padding: 24px; 
+        text-align: center; 
+        overflow: hidden; 
+    }
+
+    .cat-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+        gap: 15px; 
+        margin-top: 20px; 
+    }
+
+    .cat-card { 
+        background: var(--card); 
+        border-radius: 12px; 
+        overflow: hidden; 
+        border: 1px solid var(--border); 
+    }
+
+    .cat-card img { 
+        width: 100%; 
+        height: 150px; 
+        object-fit: cover; 
+    }
+
+    /* Input & Button diperbaiki agar tidak overflow */
+    input, button { 
+        width: 100%; 
+        margin: 10px 0; 
+        padding: 14px; 
+        border-radius: 12px; 
+        border: 1px solid var(--border); 
+        font-size: 15px;
+        outline: none;
+    }
+
+    input { 
+        background: #ffffff; 
+        color: #1e293b; 
+    }
+
+    button { 
+        background: var(--accent); 
+        color: #020617; 
+        font-weight: bold; 
+        border: none; 
+        cursor: pointer; 
+        transition: 0.2s;
+    }
+
+    button:active {
+        transform: scale(0.98);
+    }
+
+    /* Grup tombol untuk Downloader agar rapi bersampingan */
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .btn-group button {
+        flex: 1;
+    }
+
+    .btn-outline {
+        background: transparent; 
+        color: var(--accent); 
+        border: 1px solid var(--accent);
+    }
+
+    .btn-tg { 
+        background: #24A1DE; 
+        color: white; 
+        text-decoration: none; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+    }
+
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(10px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
   </style>
 </head>
 <body>
 
 <div class="nav-bar">
-    <div class="nav-item active" onclick="showTab('home')">🏠 Home</div>
-    <div class="nav-item" onclick="showTab('clear')">✨ Enchancer Photo</div>
-    <div class="nav-item" onclick="showTab('dl')">🎬 Downloader</div>
+    <div class="nav-item active" onclick="showTab(event, 'home')">🏠 Home</div>
+    <div class="nav-item" onclick="showTab(event, 'clear')">✨ Enchancer Photo</div>
+    <div class="nav-item" onclick="showTab(event, 'dl')">🎬 Downloader</div>
 </div>
 
 <div class="container">
     <div id="home" class="section active">
         <div class="card">
-            <img src="/static/uploads/100003748.jpg" style="width: 120px; border-radius: 50%; border: 3px solid var(--accent);">
-            <h1>$CATON</h1>
-            <p>The first meme coin on paxi ecosystem L1 with real utility tools Artificial Intelegent</p>
-            <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-family: monospace; word-break: break-all;">CA: 0x1234...CATOVISION</div>
+            <img src="/static/uploads/100003748.jpg" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px;">
+            <h1 style="margin: 10px 0;">$CATON</h1>
+            <p style="color: #94a3b8;">The first meme coin on paxi ecosystem L1 with real utility tools Artificial Intelligence</p>
+            <div style="background: #1e293b; padding: 12px; border-radius: 10px; font-family: monospace; word-break: break-all; color: var(--accent);">CA: 0x1234...CATOVISION</div>
             
-            <div style="margin-top: 15px;">
+            <div style="margin-top: 20px;">
                 <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" style="text-decoration: none;">
                     <button class="btn-tg">Join Telegram Community</button>
                 </a>
             </div>
         </div>
         
-        <h3>🖼️ Cat Collection Gallery</h3>
+        <h3 style="margin-top: 30px;">🖼️ Cat Collection Gallery</h3>
         <div class="cat-grid">
             {% for cat in cats %}
             <div class="cat-card">
                 <img src="/static/uploads/{{ cat.img }}" alt="cat image">
-                <div style="padding: 10px; font-size: 12px;">{{ cat.name }}</div>
+                <div style="padding: 10px; font-size: 12px; text-align: center;">{{ cat.name }}</div>
             </div>
             {% endfor %}
         </div>
@@ -59,9 +202,10 @@
 
     <div id="clear" class="section">
         <div class="card">
-            <h2>✨ AI Photo Enchancer</h2>
+            <h2 style="margin-top: 0;">✨ AI Photo Enchancer</h2>
+            <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Unggah foto untuk meningkatkan kualitas gambar secara otomatis.</p>
             <form action="/enhance" method="post" enctype="multipart/form-data">
-                <input type="file" name="photo" accept="image/*" required>
+                <input type="file" name="photo" accept="image/*" required style="background: #1e293b; color: white;">
                 <button type="submit">Proses & Download</button>
             </form>
         </div>
@@ -69,12 +213,13 @@
 
     <div id="dl" class="section">
         <div class="card">
-            <h2>🎬 AI Downloader</h2>
+            <h2 style="margin-top: 0;">🎬 AI Downloader</h2>
+            <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Download video favorit dari YouTube atau TikTok dengan mudah.</p>
             <form method="post" action="/download">
                 <input name="url" type="url" placeholder="Paste link video (YT/TikTok)" required>
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" name="mode" value="video">Download Video</button>
-                    <button type="submit" name="mode" value="audio" style="background: transparent; color: var(--accent); border: 1px solid var(--accent);">Download MP3</button>
+                <div class="btn-group">
+                    <button type="submit" name="mode" value="video">Video</button>
+                    <button type="submit" name="mode" value="audio" class="btn-outline">MP3</button>
                 </div>
             </form>
         </div>
@@ -82,17 +227,20 @@
 </div>
 
 <script>
-function showTab(id) {
+function showTab(event, id) {
+    // Sembunyikan semua section
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    
+    // Hapus status active dari semua nav-item
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    // Tampilkan section yang dipilih
     document.getElementById(id).classList.add('active');
+    
+    // Tambahkan status active ke tombol yang diklik
     event.currentTarget.classList.add('active');
 }
 </script>
+
 </body>
 </html>
-
-
-
-
-
