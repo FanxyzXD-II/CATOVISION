@@ -51,12 +51,15 @@ def download_media():
             f.write(cookies_data)
     
     ydl_opts = {
-        'format': 'best' if mode == 'video' else 'bestaudio/best',
+        # 'best' kadang gagal, 'bestvideo+bestaudio/best' lebih stabil
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'quiet': True,
         'no_warnings': True,
-        'cookiefile': cookie_path if cookies_data else None,
+        'cookiefile': cookie_path,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'nocheckcertificate': True,
     }
+
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -70,4 +73,5 @@ def download_media():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
