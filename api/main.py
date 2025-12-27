@@ -4,19 +4,19 @@ import yt_dlp
 from flask import Flask, render_template, request, jsonify, send_file, redirect
 from PIL import Image, ImageEnhance
 
-# Inisialisasi Flask
+# Inisialisasi Flask: Sesuaikan path jika file berada di folder api/
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 @app.route("/")
 def index():
-    # Data gallery kucing
+    # Data gallery tetap dipertahankan
     koleksi_kucing = [
         {"id": 1, "name": "green cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "turquoise cat", "img": "1000037421.jpg"},
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
-# --- FITUR ENHANCER (TIDAK DIHAPUS) ---
+# --- FITUR PHOTO ENHANCER ---
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
     if 'photo' not in request.files:
@@ -25,18 +25,17 @@ def enhance_photo():
     file = request.files['photo']
     img = Image.open(file.stream).convert("RGB")
     
-    # Logika Enhancer (Sharpen & Contrast)
+    # Logika Enhancer asli
     img = ImageEnhance.Sharpness(img).enhance(2.5)
     img = ImageEnhance.Contrast(img).enhance(1.4)
     
-    # Simpan ke memori (RAM) agar kompatibel dengan Vercel yang Read-Only
     img_io = io.BytesIO()
     img.save(img_io, 'JPEG', quality=95)
     img_io.seek(0)
     
     return send_file(img_io, mimetype='image/jpeg', as_attachment=True, download_name="CATO_HD.jpg")
 
-# --- FITUR DOWNLOADER DENGAN PILIHAN RESOLUSI ---
+# --- FITUR DOWNLOADER (LOGIKA BARU) ---
 @app.route("/get-info", methods=["POST"])
 def get_info():
     url = request.form.get('url')
@@ -62,12 +61,12 @@ def get_info():
             formats_list = []
             
             for f in info.get('formats', []):
-                # Filter format yang sudah ada video + audio (siap download)
+                # Filter format video yang sudah ada audionya (Direct Link)
                 if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
                     res = f.get('height')
                     ext = f.get('ext')
                     filesize = f.get('filesize')
-                    size_text = f"{round(filesize / (1024*1024), 1)} MB" if filesize else "Ukuran Tidak Diketahui"
+                    size_text = f"{round(filesize / (1024*1024), 1)} MB" if filesize else "Unknown Size"
                     
                     formats_list.append({
                         'resolution': f"{res}p" if res else "N/A",
@@ -76,7 +75,7 @@ def get_info():
                         'url': f.get('url')
                     })
             
-            # Ambil satu URL audio terbaik untuk opsi MP3
+            # Format Audio untuk MP3
             audio_url = None
             for f in reversed(info.get('formats', [])):
                 if f.get('vcodec') == 'none' and f.get('acodec') != 'none':
