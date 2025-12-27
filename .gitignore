@@ -1,5 +1,8 @@
 venv/
+cookies.txt
+python
 __pycache__/
 static/uploads/*
 *.pyc
 .env
+
