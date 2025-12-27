@@ -27,16 +27,16 @@
 
 <div class="nav-bar">
     <div class="nav-item active" onclick="showTab('home')">🏠 Home</div>
-    <div class="nav-item" onclick="showTab('clear')">✨ Clear Photo</div>
-    <div class="nav-item" onclick="showTab('dl')">🎬 Downloader</div>
+    <div class="nav-item" onclick="showTab('clear')">✨ Enchancer Photo>purif
+    <div class="nav-item" onclick="showTab('dl')">🎬 Downloader VIDEO</div>
 </div>
 
 <div class="container">
     <div id="home" class="section active">
         <div class="card">
-            <img src="/static/uploads/1000037429.jpg" style="width: 120px; border-radius: 50%; border: 3px solid var(--accent);">
+            <img src="/static/uploads/100003748.jpg" style="width: 120px; border-radius: 50%; border: 3px solid var(--accent);">
             <h1>$CATON</h1>
-            <p>The first meme coin with real utility tools AI.</p>
+            <p>The first meme coin on paxi ecosystem L1 with real utility tools Artificial Intelegent.</p>
             <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-family: monospace; word-break: break-all;">CA: 0x1234...CATOVISION</div>
             
             <div style="margin-top: 15px;">
@@ -59,7 +59,7 @@
 
     <div id="clear" class="section">
         <div class="card">
-            <h2>✨ AI Photo Enhancer</h2>
+            <h2>✨ AI Photo Enchancer</h2>
             <form action="/enhance" method="post" enctype="multipart/form-data">
                 <input type="file" name="photo" accept="image/*" required>
                 <button type="submit">Proses & Download</button>
@@ -69,7 +69,7 @@
 
     <div id="dl" class="section">
         <div class="card">
-            <h2>🎬 Media Downloader</h2>
+            <h2>🎬 AI Downloader</h2>
             <form method="post" action="/download">
                 <input name="url" type="url" placeholder="Paste link video (YT/TikTok)" required>
                 <div style="display: flex; gap: 10px;">
@@ -91,4 +91,5 @@ function showTab(id) {
 </script>
 </body>
 </html>
+
 
