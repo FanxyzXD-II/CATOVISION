@@ -63,15 +63,31 @@ def download_media():
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # download=False wajib agar tidak kena error Read-Only
             info = ydl.extract_info(url, download=False)
-            download_url = info.get('url') or info.get('formats')[0].get('url')
             
+            # Mencari URL download yang bisa langsung diakses
+            download_url = info.get('url')
+            
+            # Jika 'url' tidak ada di root, cari di daftar formats
+            if not download_url and 'formats' in info:
+                for f in info['formats']:
+                    if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
+                        download_url = f.get('url')
+                        break
+
+            if not download_url:
+                return "Format video tidak ditemukan atau tidak didukung", 404
+            
+            # Kirim user langsung ke file videonya
             from flask import redirect
             return redirect(download_url)
+            
     except Exception as e:
         return f"Gagal memproses video: {str(e)}", 500
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
