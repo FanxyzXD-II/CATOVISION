@@ -38,20 +38,22 @@ def enhance_photo():
 @app.route("/download", methods=["POST"])
 def download_media():
     url = request.form.get('url')
-    mode = request.form.get('mode') 
+    mode = request.form.get('mode')
     
     if not url:
         return "URL wajib diisi", 400
 
-    # PERBAIKAN DI SINI
+    # Mendapatkan path absolut ke file cookies.txt
+    # Ini memastikan yt-dlp mencari di lokasi yang tepat di server Vercel
+    path_ke_cookie = os.path.join(os.getcwd(), 'cookies.txt')
+
     ydl_opts = {
         'format': 'best' if mode == 'video' else 'bestaudio/best',
         'quiet': True,
         'no_warnings': True,
-        'cookiefile': 'cookies.txt',  # Pastikan baris ini ada
+        'cookiefile': path_ke_cookie, # Menggunakan path yang sudah diperbaiki
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     }
-
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -69,6 +71,7 @@ def download_media():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
