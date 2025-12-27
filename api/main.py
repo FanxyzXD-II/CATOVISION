@@ -1,6 +1,14 @@
 import os
 import io
 import yt_dlp
+ydl_opts = {
+    'format': 'best',
+    'quiet': True,
+    'no_warnings': True,
+    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    # Jika masih error, Anda harus menambahkan file cookies.txt
+    # 'cookiefile': 'cookies.txt' 
+}
 from flask import Flask, render_template, request, send_file, Response
 from PIL import Image, ImageEnhance
 
@@ -65,4 +73,5 @@ def download_media():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
