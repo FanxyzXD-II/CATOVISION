@@ -14,7 +14,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route("/")
 def index():
-    """Halaman Utama - Menjaga data foto kucing agar tetap tampil"""
+    """Halaman Utama - Grid foto kucing tetap muncul"""
     koleksi_kucing = [
         {"id": 1, "name": "Green Cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "Turquoise Cat", "img": "1000037421.jpg"},
@@ -23,7 +23,7 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur Photo Enhancer - Tetap dipertahankan"""
+    """Fitur Photo Enhancer"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
@@ -40,7 +40,7 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """AI Analyst - Data Binance 2025 (Harga + Volume)"""
+    """AI Analyst - Binance + Order Book + Fear & Greed"""
     user_query = request.form.get('query', '')
     lang_code = request.form.get('lang', 'id')
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -55,45 +55,56 @@ def chat():
     if not GROQ_API_KEY:
         return jsonify({"reply": "API Key Groq tidak ditemukan."})
 
-    # 1. Integrasi Data Real-time Binance (Harga + Volume)
+    # 1. Ambil Data Real-time (Binance & Sentimen)
     market_context = ""
+    sentiment_context = ""
     try:
+        # A. Data Binance (Harga, Volume, Depth)
         clean_coin = user_query.split()[-1].strip('().').upper()
         symbol = f"{clean_coin}USDT"
         
-        # Panggilan API Binance ticker 24j
-        res = requests.get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", timeout=5).json()
+        ticker = requests.get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol}", timeout=5).json()
+        depth = requests.get(f"https://api.binance.com/api/v3/depth?symbol={symbol}&limit=5", timeout=5).json()
         
-        if 'lastPrice' in res:
-            price = float(res['lastPrice'])
-            change = float(res['priceChangePercent'])
-            volume = float(res['volume']) # Volume dalam aset dasar
-            quote_volume = float(res['quoteVolume']) # Volume dalam USDT
+        # B. Data Fear & Greed Index (Alternative.me API)
+        fg_res = requests.get("https://api.alternative.me/fng/", timeout=5).json()
+        fng_value = fg_res['data'][0]['value']
+        fng_status = fg_res['data'][0]['value_classification']
+        sentiment_context = f"Sentimen Pasar Global: {fng_value}/100 ({fng_status})."
+
+        if 'lastPrice' in ticker:
+            price = float(ticker['lastPrice'])
+            change = float(ticker['priceChangePercent'])
+            volume = float(ticker['quoteVolume'])
+            top_bid = depth['bids'][0][0]
+            top_ask = depth['asks'][0][0]
             
             market_context = (
-                f"BINANCE LIVE DATA ({current_time}): {symbol} Price ${price:,.2f} USD "
-                f"({change}% 24h). 24h Volume: {quote_volume:,.2f} USDT."
+                f"WAKTU: {current_time}. ASET: {symbol}. HARGA: ${price:,.2f} ({change}% 24h). "
+                f"VOLUME: {volume:,.2f} USDT. ORDER BOOK: Bid ${top_bid}, Ask ${top_ask}. "
+                f"{sentiment_context}"
             )
     except Exception:
-        market_context = f"Market data unavailable. Current date: {current_time}."
+        market_context = f"Data real-time terbatas. Waktu: {current_time}. {sentiment_context}"
 
     # 2. Request ke Groq (Llama 3.3)
     try:
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         
         system_prompt = (
-            f"MANDATORY: YOU MUST RESPOND 100% IN {target_lang}. "
-            f"You are CATOVISION AI, a world-class crypto analyst in year 2025. "
-            f"Requirement: Start by mentioning the real-time price and 24h volume from: '{market_context}'. "
-            f"Analyze: 1. Trend & Candlestick patterns. 2. Support/Demand based on Volume. 3. Buy/Sell Signals. "
-            f"Crucial: 'SOL' is Solana, not Linux. Use data from 2025 ONLY."
+            f"MANDATORY: RESPONSE MUST BE 100% IN {target_lang}. "
+            f"You are CATOVISION AI, an elite crypto analyst operating in year 2025. "
+            f"Requirement: Start with Price, Volume, and Fear & Greed Index from: '{market_context}'. "
+            f"Analysis: 1. Sentiment impact (Fear/Greed). 2. Order book walls (Bid/Ask). 3. Candlestick & Trend. "
+            f"Signals: Buy/Sell/Wait with Entry, TP, and SL. "
+            f"Rule: 'SOL' = Solana. No Linux talk. Use 2025 context only."
         )
 
         payload = {
             "model": "llama-3.3-70b-versatile", #
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Language: {target_lang}. Query: {user_query}. Context: {market_context}"}
+                {"role": "user", "content": f"Language: {target_lang}. Query: {user_query}. Data: {market_context}"}
             ],
             "temperature": 0.2 #
         }
@@ -104,9 +115,10 @@ def chat():
         if response.status_code == 200 and 'choices' in res_json:
             return jsonify({"reply": res_json['choices'][0]['message']['content']})
         
-        return jsonify({"reply": "CATOVISION is busy analyzing market data."})
+        return jsonify({"reply": "CATOVISION sedang menganalisis psikologi market."})
 
     except Exception as e:
         return jsonify({"reply": f"System Error: {str(e)}"})
 
 app = app
+
