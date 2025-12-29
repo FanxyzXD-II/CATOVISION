@@ -46,16 +46,31 @@
 
 <div class="container">
     <div id="home" class="section active">
-        <div class="card">
-            <img src="/static/uploads/100003748.jpg" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 10px;">
-            <h1>$CATON</h1>
-          <p id="h-desc" style="color:#94a3b8; font-size: 14px; margin-bottom: 5px;">The first meme coin on paxi ecosystem L1 with real utility AI tools</p>
-            
-            <div class="ca-box">
-                CA: paxi1p4sfxfspqrf67hmu0l2ee7h02puxaqut2jqqhd
-            </div>
-            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-tg">Join Telegram Community</a>
+<div class="card">
+    <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 10px;">
+    <h1 style="margin: 10px 0; font-size: 2.5rem;">$CATON</h1>
+    <p id="h-desc" style="color:#94a3b8; font-size: 14px; margin-bottom: 15px;">The first meme coin on paxi ecosystem L1 with real utility AI tools</p>
+    
+    <div style="margin-bottom: 20px;">
+        <span style="display: block; font-weight: bold; margin-bottom: 5px; color: var(--text);">CA:</span>
+        <div style="background: rgba(30, 41, 59, 0.7); 
+                    padding: 12px; 
+                    border-radius: 12px; 
+                    font-family: 'Courier New', monospace; 
+                    font-size: 13px; 
+                    word-wrap: break-word; 
+                    overflow-wrap: break-word; 
+                    border: 1px dashed var(--accent); 
+                    color: var(--accent);
+                    line-height: 1.4;">
+            paxi1p4sfxfspqrf67hmu0l2ee7h02puxaqut2jqqhd
         </div>
+    </div>
+
+    <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg">
+        <span id="h-tg">Join Telegram Community</span>
+    </a>
+</div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;">
             {% for cat in cats %}
             <div style="background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border);">
@@ -160,6 +175,7 @@ setLang('id');
 </script>
 </body>
 </html>
+
 
 
 
