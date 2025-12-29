@@ -3,96 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catovision AI meme on PAXI</title>
+  <title>CATOVISION AI On PAXI First meme coin AI on PAXI</title>
   <style>
-    /* CSS ASLI ANDA DI PERTAHANKAN */
-    :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; }
-    * { box-sizing: border-box; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding-bottom: 50px; }
-    .nav-bar { display: flex; justify-content: flex-start; overflow-x: auto; white-space: nowrap; gap: 12px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; scrollbar-width: none; }
-    .nav-item { cursor: pointer; padding: 10px 20px; border-radius: 14px; transition: 0.3s; font-weight: bold; flex-shrink: 0; font-size: 14px; }
-    .nav-item.active { background: var(--accent); color: #020617; }
-    .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-    .section { display: none; animation: fadeIn 0.5s ease; }
+    :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; --ai-bubble: rgba(30, 41, 59, 0.5); }
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+    .nav-bar { display: flex; gap: 10px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; scrollbar-width: none; }
+    .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+    .nav-item.active { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .lang-selector { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 5px; }
+    .lang-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+    .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+    .container { max-width: 700px; margin: auto; padding: 0 15px; }
+    .section { display: none; animation: fadeIn 0.4s ease; }
     .section.active { display: block; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
-    .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
-    .cat-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-    .cat-card img { width: 100%; height: 150px; object-fit: cover; }
-    input, button { width: 100%; margin: 10px 0; padding: 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 15px; outline: none; }
-    input { background: #ffffff; color: #1e293b; }
-    button { background: var(--accent); color: #020617; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
-    
-    /* STYLE TAMBAHAN UNTUK LIST RESOLUSI */
-    .btn-res { background: #1e293b; color: white; display: flex; justify-content: space-between; border: 1px solid var(--border); margin-bottom: 8px; }
-    .btn-mp3 { background: #22c55e; color: white; }
-    #loading { margin: 10px; color: var(--accent); display: none; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; }
+    .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
+    .chat-container { display: flex; flex-direction: column; height: 68vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none; }
+    .user-row { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 14px; font-weight: 500; }
+    .ai-bubble { background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13.5px; line-height: 1.6; border: 1px solid rgba(255,255,255,0.05); }
+    .quick-actions { display: flex; gap: 8px; padding: 0 20px 12px 20px; overflow-x: auto; scrollbar-width: none; }
+    .btn-quick { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+    .input-wrapper { padding: 15px; background: #070a13; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .input-wrapper input { background: #1e293b; border: 1px solid var(--border); color: #fff; flex: 1; padding: 10px 15px; border-radius: 20px; outline: none; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
 
 <div class="nav-bar">
-    <div class="nav-item active" onclick="showTab(event, 'home')">🏠 Home</div>
-    <div class="nav-item" onclick="showTab(event, 'clear')">✨ Photo Enhancer</div>
-    <div class="nav-item" onclick="showTab(event, 'dl')">🎬 Downloader</div>
+    <div class="nav-item active" id="n-home" onclick="showTab(event, 'home')">🏠 Home</div>
+    <div class="nav-item" id="n-ai" onclick="showTab(event, 'ai')">📊 AI Analyst</div>
+    <div class="nav-item" id="n-clear" onclick="showTab(event, 'clear')">✨ AI Enhancer</div>
+</div>
+
+<div class="lang-selector">
+    <button class="lang-btn active" onclick="setLang('id')">🇲🇨ID</button>
+    <button class="lang-btn" onclick="setLang('en')">🇺🇲EN</button>
+    <button class="lang-btn" onclick="setLang('zh')">🇨🇳ZH</button>
 </div>
 
 <div class="container">
     <div id="home" class="section active">
         <div class="card">
-            <img src="/static/uploads/100003748.jpg" style="width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px;">
+            <img src="/static/uploads/100003748.jpg" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 10px;">
             <h1>$CATON</h1>
-            <p>The first meme coin on paxi ecosystem L1 with real utility tools Artificial Intelegent</p>
-            <div style="background: #1e293b; padding: 10px; border-radius: 8px; font-family: monospace; word-break: break-all;">CA: paxi1p4sfxfspqrf67hmu0l2ee7h02puxaqut2jqqhd</div>
-            
-            <div style="margin-top: 15px;">
-                <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" style="text-decoration: none;">
-                    <button class="btn-tg">Join Telegram Community</button>
-                </a>
-            </div>
+            <p id="h-desc" style="color:#94a3b8; font-size: 14px;">The first meme coin on paxi ecosystem L1 with real utility AI tools</p>
+            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-tg">Join Telegram Community</a>
         </div>
-        
-        <h3 style="margin-top: 30px;">🖼️ Cat Collection Gallery</h3>
-        <div class="cat-grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;">
             {% for cat in cats %}
-            <div class="cat-card">
-                <img src="/static/uploads/{{ cat.img }}">
-                <div style="padding: 10px; font-size: 12px; text-align: center;">{{ cat.name }}</div>
+            <div style="background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border);">
+                <img src="/static/uploads/{{ cat.img }}" style="width:100%; height:120px; object-fit:cover;">
+                <p style="text-align:center; font-size:12px; margin:8px 0;">{{ cat.name }}</p>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <div id="clear" class="section">
-        <div class="card">
-            <h2>✨ AI Photo Enhancer</h2>
-            <form action="/enhance" method="post" enctype="multipart/form-data">
-                <input type="file" name="photo" accept="image/*" required style="background: #1e293b; color: white;">
-                <button type="submit">Proses & Download</button>
-            </form>
+    <div id="ai" class="section">
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages">
+                <div class="ai-bubble" id="ai-greet">
+                    <strong>CATOVISION AI ANALYST</strong><br>Halo Trader, berikan nama aset untuk analisis market structure & zone.
+                </div>
+            </div>
+            <div class="quick-actions" id="q-box">
+                <button class="btn-quick" id="q1" onclick="quickQuery(this.dataset.q)">📊 Analisa BTC</button>
+                <button class="btn-quick" id="q2" onclick="quickQuery(this.dataset.q)">🎯 Sinyal SOL</button>
+                <button class="btn-quick" id="q3" onclick="quickQuery(this.dataset.q)">💎 Level ETH</button>
+            </div>
+            <div class="input-wrapper">
+                <input id="userQuery" type="text" placeholder="Tanya koin...">
+                <button onclick="askAI()" style="background:var(--accent); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">Send</button>
+            </div>
         </div>
     </div>
 
-    <div id="dl" class="section">
+    <div id="clear" class="section">
         <div class="card">
-            <h2>🎬 AI Downloader</h2>
-            <input id="videoUrl" type="url" placeholder="Paste link (YouTube/TikTok)" required>
-            <button id="btnFetch" onclick="fetchFormats()">Cek Resolusi Video</button>
-            
-            <div id="loading">⏳ Menyiapkan pilihan format...</div>
-
-            <div id="resultArea" style="display:none; margin-top: 20px; text-align: left;">
-                <img id="vidThumb" src="" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
-                <h4 id="vidTitle" style="margin-bottom: 15px; font-size: 14px;"></h4>
-                <div id="formatList"></div>
-            </div>
+            <h2 id="e-title">✨ AI Photo Enhancer</h2>
+            <form action="/enhance" method="post" enctype="multipart/form-data">
+                <input type="file" name="photo" accept="image/*" required style="display:block; width:100%; margin:20px 0;">
+                <button type="submit" class="btn-tg" style="width:100%; border:none; cursor:pointer;" id="e-btn">Process HD</button>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
+const trans = {
+    id: { 
+        h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", 
+        ai_greet: "<strong>Analyst Mode</strong><br>Halo Trader, berikan nama aset untuk analisis structure & zone.",
+        e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD",
+        q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH"
+    },
+    en: { 
+        h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram ", 
+        ai_greet: "<strong>Analyst Mode</strong><br>Hello Trader, provide an asset name for structure analysis.",
+        e_title: "✨ AI Photo Enhancer", e_btn: "Process HD",
+        q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand"
+    },
+    zh: { 
+        h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", 
+        ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行结构分析。",
+        e_title: "✨ AI 照片增强器", e_btn: "处理高清",
+        q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区"
+    }
+};
+let curLang = 'id';
+
+function setLang(l) {
+    curLang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('h-desc').innerText = trans[l].h_desc;
+    document.getElementById('h-tg').innerText = trans[l].h_tg;
+    document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
+    document.getElementById('e-title').innerText = trans[l].e_title;
+    document.getElementById('e-btn').innerText = trans[l].e_btn;
+    
+    document.getElementById('q1').innerText = trans[l].q1; document.getElementById('q1').dataset.q = trans[l].q1q;
+    document.getElementById('q2').innerText = trans[l].q2; document.getElementById('q2').dataset.q = trans[l].q2q;
+    document.getElementById('q3').innerText = trans[l].q3; document.getElementById('q3').dataset.q = trans[l].q3q;
+}
+
 function showTab(e, id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -100,47 +137,25 @@ function showTab(e, id) {
     e.currentTarget.classList.add('active');
 }
 
-async function fetchFormats() {
-    const url = document.getElementById('videoUrl').value;
-    const loading = document.getElementById('loading');
-    const resultArea = document.getElementById('resultArea');
-    const formatList = document.getElementById('formatList');
+function quickQuery(q) { document.getElementById('userQuery').value = q; askAI(); }
 
-    if(!url) return alert("Tempel link video!");
+async function askAI() {
+    const i = document.getElementById('userQuery'); const b = document.getElementById('chatMessages');
+    if(!i.value) return;
+    const val = i.value; b.innerHTML += `<div class="user-row">${val}</div>`;
+    i.value = ''; b.scrollTop = b.scrollHeight;
+    const fd = new FormData(); fd.append('query', val); fd.append('lang', curLang);
+    const res = await fetch('/chat', { method: 'POST', body: fd });
+    const data = await res.json();
+    b.innerHTML += `<div class="ai-bubble">${data.reply.replace(/\n/g, '<br>')}</div>`;
+    b.scrollTop = b.scrollHeight;
+}
 
-    loading.style.display = 'block';
-    resultArea.style.display = 'none';
-    formatList.innerHTML = '';
-
-    try {
-        const formData = new FormData();
-        formData.append('url', url);
-
-        const response = await fetch('/get-info', { method: 'POST', body: formData });
-        const data = await response.json();
-        if(data.error) throw new Error(data.error);
-
-        document.getElementById('vidThumb').src = data.thumbnail;
-        document.getElementById('vidTitle').innerText = data.title;
-
-        // Tombol Video per resolusi
-        data.formats.forEach(f => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-res';
-            btn.innerHTML = `<span>🎬 ${f.resolution}</span> <span>${f.size}</span>`;
-            btn.onclick = () => window.open(f.url, '_blank');
-            formatList.appendChild(btn);
-        });
-
-        // Tombol MP3
-        if(data.audio_url) {
-            const btnA = document.createElement('button');
-            btnA.className = 'btn-mp3';
-            btnA.innerHTML = `🎵 Download Audio (MP3)`;
-            btnA.onclick = () => window.open(data.audio_url, '_blank');
-            formatList.appendChild(btnA);
-        }
-
+// Inisialisasi awal dataset tombol
+setLang('id');
+</script>
+</body>
+</html>
         resultArea.style.display = 'block';
     } catch (e) {
         alert("Gagal: " + e.message);
@@ -151,6 +166,7 @@ async function fetchFormats() {
 </script>
 </body>
 </html>
+
 
 
 
