@@ -13,7 +13,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route("/")
 def index():
-    """Halaman Utama - Mengirim data foto agar grid muncul"""
+    """Halaman Utama - Data foto kucing tetap ada"""
     koleksi_kucing = [
         {"id": 1, "name": "Green Cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "Turquoise Cat", "img": "1000037421.jpg"},
@@ -22,7 +22,7 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur Photo Enhancer - TETAP DIPERTAHANKAN"""
+    """Fitur Photo Enhancer - Tetap dipertahankan"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
@@ -39,52 +39,66 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst - Fokus 100% Crypto & Harga Live"""
+    """Fitur AI Analyst - Perbaikan Bahasa & Harga Real-time"""
     user_query = request.form.get('query', '')
-    lang = request.form.get('lang', 'id')
+    lang_code = request.form.get('lang', 'id')
     
+    # Mapping kode bahasa untuk instruksi AI yang lebih jelas
+    lang_map = {
+        'id': 'Indonesian (Bahasa Indonesia)',
+        'en': 'English',
+        'zh': 'Chinese (Mandarin/Simplified Chinese)'
+    }
+    target_lang = lang_map.get(lang_code, 'Indonesian (Bahasa Indonesia)')
+
     if not GROQ_API_KEY:
         return jsonify({"reply": "API Key Groq tidak ditemukan."})
 
-    # 1. Optimasi Pencarian CoinGecko (Ambil kata kunci saja, misal: 'BTC')
-    market_context = "Tidak disediakan."
-    clean_query = user_query.split()[-1].strip('().') # Ambil kata terakhir (misal 'SOL')
+    # 1. Ambil Data Harga Real-time
+    market_context = ""
+    # Membersihkan query untuk mencari ID koin (misal ambil kata terakhir 'SOL')
+    clean_coin_name = user_query.split()[-1].strip('().')
     
     try:
-        # Cari ID koin
-        search_res = requests.get(f"https://api.coingecko.com/api/v3/search?query={clean_query}", timeout=5).json()
+        search_res = requests.get(f"https://api.coingecko.com/api/v3/search?query={clean_coin_name}", timeout=5).json()
         if search_res.get('coins'):
             coin_id = search_res['coins'][0]['id']
-            # Ambil harga detail
-            p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true", timeout=5).json()
+            p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true", timeout=5).json()
             if coin_id in p_res:
                 data = p_res[coin_id]
-                market_context = f"HARGA {coin_id.upper()} SAAT INI: ${data['usd']} USD | PERUBAHAN 24J: {round(data.get('usd_24h_change', 0), 2)}%."
+                price_val = data['usd']
+                change_val = round(data.get('usd_24h_change', 0), 2)
+                # Context dalam bahasa target agar AI langsung paham
+                if lang_code == 'zh':
+                    market_context = f"{coin_id.upper()} 当前价格: ${price_val} USD (24小时变化: {change_val}%)"
+                elif lang_code == 'en':
+                    market_context = f"CURRENT {coin_id.upper()} PRICE: ${price_val} USD (24h Change: {change_val}%)"
+                else:
+                    market_context = f"HARGA {coin_id.upper()} SAAT INI: ${price_val} USD (Perubahan 24j: {change_val}%)"
     except Exception:
-        pass
+        market_context = "Data harga live tidak tersedia / Live price data unavailable."
 
-    # 2. Request ke Groq dengan Instruksi Ketat
+    # 2. Request ke Groq dengan Prompt Bahasa yang Sangat Ketat
     try:
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         
         system_prompt = (
-            f"You are CATOVISION AI, a world-class Cryptocurrency technical analyst. "
-            f"Mandatory: Respond 100% in {lang}. "
-            f"Strict Rules: "
-            f"1. Always start your analysis by mentioning the 'DATA HARGA SAAT INI' provided. "
-            f"2. Focus 100% on Candlestick patterns, market trends (Bullish/Bearish), and crypto structure. "
-            f"3. Provide signals: BUY/SELL/WAIT, Entry price (must be near current price), TP, and SL. "
-            f"4. 'SOL' refers ONLY to Solana cryptocurrency, NEVER Linux. "
-            f"5. Use a professional trader tone."
+            f"STRICT RULE: You MUST respond 100% in {target_lang}. "
+            f"You are CATOVISION AI, a Cryptocurrency expert. "
+            f"Analyze ONLY crypto markets and candlestick patterns. "
+            f"Mandatory: Use the provided price data: '{market_context}' in your first sentence. "
+            f"Identify Trends (Bullish/Bearish), Support/Demand, and provide Buy/Sell signals with Entry, TP, and SL. "
+            f"Reminder: 'SOL' is Solana crypto, not Linux. "
+            f"Do not use any other language than {target_lang}."
         )
 
         payload = {
             "model": "llama-3.3-70b-versatile",
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"MARKET DATA: {market_context}\n\nUSER QUESTION: {user_query}"}
+                {"role": "user", "content": f"Language: {target_lang}\nMarket Context: {market_context}\nQuestion: {user_query}"}
             ],
-            "temperature": 0.3 # Diperendah agar AI lebih patuh pada angka harga
+            "temperature": 0.3 # Suhu rendah agar AI patuh pada instruksi bahasa dan data
         }
         
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=20)
@@ -93,10 +107,9 @@ def chat():
         if response.status_code == 200 and 'choices' in res_json:
             return jsonify({"reply": res_json['choices'][0]['message']['content']})
         
-        return jsonify({"reply": "Maaf, CATOVISION sedang sibuk memproses data market."})
+        return jsonify({"reply": "Error: AI sedang sibuk memproses data."})
 
     except Exception as e:
-        return jsonify({"reply": f"Error: {str(e)}"})
+        return jsonify({"reply": f"System Error: {str(e)}"})
 
 app = app
-
