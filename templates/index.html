@@ -3,80 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CATOVISION AI On PAXI First meme coin AI on PAXI</title>
+  <title>CATON AI meme</title>
   <style>
     :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; --ai-bubble: rgba(30, 41, 59, 0.5); }
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; overflow-x: hidden; }
+    
     .nav-bar { display: flex; gap: 10px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; scrollbar-width: none; }
     .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
     .nav-item.active { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+
     .lang-selector { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 5px; }
     .lang-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
     .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+
     .container { max-width: 700px; margin: auto; padding: 0 15px; }
-    .section { display: none; animation: fadeIn 0.4s ease; }
-    .section.active { display: block; }
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.4s ease; }
+
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; }
+    
+    /* PERBAIKAN CA BOX AGAR RAPI DI HP */
+    .ca-container { margin: 15px 0; }
+    .ca-label { font-weight: bold; display: block; margin-bottom: 5px; color: #94a3b8; font-size: 12px; }
+    .ca-box { 
+        background: rgba(30, 41, 59, 0.7); 
+        padding: 12px; 
+        border-radius: 12px; 
+        font-family: monospace; 
+        font-size: 13px; 
+        word-break: break-all; /* Memaksa teks panjang turun ke bawah */
+        border: 1px dashed var(--accent); 
+        color: var(--accent);
+        line-height: 1.4;
+    }
+
     .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
-    .chat-container { display: flex; flex-direction: column; height: 68vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
+
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .cat-card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    .cat-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+
+    .chat-container { display: flex; flex-direction: column; height: 70vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none; }
-    .user-row { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 14px; font-weight: 500; }
-    .ai-bubble { background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13.5px; line-height: 1.6; border: 1px solid rgba(255,255,255,0.05); }
-    .quick-actions { display: flex; gap: 8px; padding: 0 20px 12px 20px; overflow-x: auto; scrollbar-width: none; }
+    .ai-bubble { align-self: flex-start; background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13.5px; border: 1px solid rgba(255,255,255,0.05); max-width: 90%; }
+    .user-bubble { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 14px; font-weight: 500; }
+    
+    .quick-actions { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; scrollbar-width: none; }
     .btn-quick { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+    
     .input-wrapper { padding: 15px; background: #070a13; border-top: 1px solid var(--border); display: flex; gap: 10px; }
     .input-wrapper input { background: #1e293b; border: 1px solid var(--border); color: #fff; flex: 1; padding: 10px 15px; border-radius: 20px; outline: none; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .btn-send { background: var(--accent); border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
 <div class="nav-bar">
-    <div class="nav-item active" id="n-home" onclick="showTab(event, 'home')">🏠 Home</div>
-    <div class="nav-item" id="n-ai" onclick="showTab(event, 'ai')">📊 AI Analyst</div>
-    <div class="nav-item" id="n-clear" onclick="showTab(event, 'clear')">✨ AI Enhancer</div>
+    <div class="nav-item active" onclick="showTab(event, 'home')">🏠 Home</div>
+    <div class="nav-item" onclick="showTab(event, 'ai')">📊 AI Analyst</div>
+    <div class="nav-item" onclick="showTab(event, 'clear')">✨ AI Enhancer</div>
 </div>
 
 <div class="lang-selector">
-    <button class="lang-btn active" onclick="setLang('id')">🇲🇨ID</button>
-    <button class="lang-btn" onclick="setLang('en')">🇺🇲EN</button>
-    <button class="lang-btn" onclick="setLang('zh')">🇨🇳ZH</button>
+    <button class="lang-btn active" onclick="setLang('id')">ID</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('zh')">ZH</button>
 </div>
 
 <div class="container">
     <div id="home" class="section active">
-<div class="card">
-    <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 10px;">
-    <h1 style="margin: 10px 0; font-size: 2.5rem;">$CATON</h1>
-    <p id="h-desc" style="color:#94a3b8; font-size: 14px; margin-bottom: 15px;">The first meme coin on paxi ecosystem L1 with real utility AI tools</p>
-    
-    <div style="margin-bottom: 20px;">
-        <span style="display: block; font-weight: bold; margin-bottom: 5px; color: var(--text);">CA:</span>
-        <div style="background: rgba(30, 41, 59, 0.7); 
-                    padding: 12px; 
-                    border-radius: 12px; 
-                    font-family: 'Courier New', monospace; 
-                    font-size: 13px; 
-                    word-wrap: break-word; 
-                    overflow-wrap: break-word; 
-                    border: 1px dashed var(--accent); 
-                    color: var(--accent);
-                    line-height: 1.4;">
-            paxi1p4sfxfspqrf67hmu0l2ee7h02puxaqut2jqqhd
-        </div>
-    </div>
-
-    <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg">
-        <span id="h-tg">Join Telegram Community</span>
-    </a>
-</div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;">
-            {% for cat in cats %}
-            <div style="background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border);">
-                <img src="/static/uploads/{{ cat.img }}" style="width:100%; height:120px; object-fit:cover;">
-                <p style="text-align:center; font-size:12px; margin:8px 0;">{{ cat.name }}</p>
+        <div class="card">
+            <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 10px;">
+            <h1 style="margin: 10px 0; font-size: 2rem;">$CATON</h1>
+            <p id="h-desc" style="color:#94a3b8; font-size: 14px;">The first meme coin on paxi ecosystem L1 with real utility AI tools</p>
+            
+            <div class="ca-container">
+                <span class="ca-label">CA:</span>
+                <div class="ca-box">paxi1p4sfxfspqrf67hmu0l2ee7h02puxaqut2jqqhd</div>
             </div>
+
+            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-tg">Join Telegram Community</a>
+        </div>
+
+        <div class="cat-grid">
+            {% for cat in cats %}
+            <div class="cat-card"><img src="/static/uploads/{{ cat.img }}"></div>
             {% endfor %}
         </div>
     </div>
@@ -85,17 +99,17 @@
         <div class="chat-container">
             <div id="chatMessages" class="chat-messages">
                 <div class="ai-bubble" id="ai-greet">
-                    <strong>CATOVISION AI ANALYST</strong><br>Halo Trader, berikan nama aset untuk analisis market structure & zone.
+                    <strong>CATOVISION Intelligence</strong><br>Halo Trader, berikan nama aset untuk analisis market structure & zone.
                 </div>
             </div>
-            <div class="quick-actions" id="q-box">
-                <button class="btn-quick" id="q1" onclick="quickQuery(this.dataset.q)">📊 Analisa BTC</button>
-                <button class="btn-quick" id="q2" onclick="quickQuery(this.dataset.q)">🎯 Sinyal SOL</button>
-                <button class="btn-quick" id="q3" onclick="quickQuery(this.dataset.q)">💎 Level ETH</button>
+            <div class="quick-actions">
+                <button class="btn-quick" id="q1" data-q="Analisa Market Structure BTC" onclick="quickQuery(this.getAttribute('data-q'))">📊 Analisa BTC</button>
+                <button class="btn-quick" id="q2" data-q="Bias Open Posisi SOL" onclick="quickQuery(this.getAttribute('data-q'))">🎯 Sinyal SOL</button>
+                <button class="btn-quick" id="q3" data-q="Area Support/Demand ETH" onclick="quickQuery(this.getAttribute('data-q'))">💎 Level ETH</button>
             </div>
             <div class="input-wrapper">
                 <input id="userQuery" type="text" placeholder="Tanya koin...">
-                <button onclick="askAI()" style="background:var(--accent); border:none; padding:8px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">Send</button>
+                <button class="btn-send" onclick="askAI()">Send</button>
             </div>
         </div>
     </div>
@@ -112,41 +126,29 @@
 </div>
 
 <script>
+// SEMUA JAVASCRIPT HARUS DI DALAM SINI
 const trans = {
-    id: { 
-        h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", 
-        ai_greet: "<strong>Analyst Mode</strong><br>Halo Trader, berikan nama aset untuk analisis structure & zone.",
-        e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD",
-        q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH"
-    },
-    en: { 
-        h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram ", 
-        ai_greet: "<strong>Analyst Mode</strong><br>Hello Trader, provide an asset name for structure analysis.",
-        e_title: "✨ AI Photo Enhancer", e_btn: "Process HD",
-        q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand"
-    },
-    zh: { 
-        h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", 
-        ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行结构分析。",
-        e_title: "✨ AI 照片增强器", e_btn: "处理高清",
-        q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区"
-    }
+    id: { h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", ai_greet: "<strong>Analyst Mode</strong><br>Halo Trader, berikan nama aset untuk analisis structure & zone.", e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH" },
+    en: { h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram", ai_greet: "<strong>Analyst Mode</strong><br>Hello Trader, provide an asset name for structure analysis.", e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand" },
+    zh: { h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行结构分析。", e_title: "✨ AI 照片增强器", e_btn: "处理高清", q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区" }
 };
+
 let curLang = 'id';
 
 function setLang(l) {
     curLang = l;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    if(event) event.target.classList.add('active');
+    
     document.getElementById('h-desc').innerText = trans[l].h_desc;
     document.getElementById('h-tg').innerText = trans[l].h_tg;
     document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
     document.getElementById('e-title').innerText = trans[l].e_title;
     document.getElementById('e-btn').innerText = trans[l].e_btn;
     
-    document.getElementById('q1').innerText = trans[l].q1; document.getElementById('q1').dataset.q = trans[l].q1q;
-    document.getElementById('q2').innerText = trans[l].q2; document.getElementById('q2').dataset.q = trans[l].q2q;
-    document.getElementById('q3').innerText = trans[l].q3; document.getElementById('q3').dataset.q = trans[l].q3q;
+    const b1 = document.getElementById('q1'); b1.innerText = trans[l].q1; b1.setAttribute('data-q', trans[l].q1q);
+    const b2 = document.getElementById('q2'); b2.innerText = trans[l].q2; b2.setAttribute('data-q', trans[l].q2q);
+    const b3 = document.getElementById('q3'); b3.innerText = trans[l].q3; b3.setAttribute('data-q', trans[l].q3q);
 }
 
 function showTab(e, id) {
@@ -156,31 +158,36 @@ function showTab(e, id) {
     e.currentTarget.classList.add('active');
 }
 
-function quickQuery(q) { document.getElementById('userQuery').value = q; askAI(); }
-
-async function askAI() {
-    const i = document.getElementById('userQuery'); const b = document.getElementById('chatMessages');
-    if(!i.value) return;
-    const val = i.value; b.innerHTML += `<div class="user-row">${val}</div>`;
-    i.value = ''; b.scrollTop = b.scrollHeight;
-    const fd = new FormData(); fd.append('query', val); fd.append('lang', curLang);
-    const res = await fetch('/chat', { method: 'POST', body: fd });
-    const data = await res.json();
-    b.innerHTML += `<div class="ai-bubble">${data.reply.replace(/\n/g, '<br>')}</div>`;
-    b.scrollTop = b.scrollHeight;
+function quickQuery(q) { 
+    document.getElementById('userQuery').value = q; 
+    askAI(); 
 }
 
-// Inisialisasi awal dataset tombol
+async function askAI() {
+    const input = document.getElementById('userQuery');
+    const box = document.getElementById('chatMessages');
+    const val = input.value.trim();
+    if(!val) return;
+
+    box.innerHTML += `<div class="user-bubble">${val}</div>`;
+    input.value = '';
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const fd = new FormData();
+        fd.append('query', val);
+        fd.append('lang', curLang);
+        const res = await fetch('/chat', { method: 'POST', body: fd });
+        const data = await res.json();
+        box.innerHTML += `<div class="ai-bubble">${data.reply.replace(/\n/g, '<br>')}</div>`;
+    } catch (e) {
+        box.innerHTML += `<div class="ai-bubble">Error: Gagal memuat data.</div>`;
+    }
+    box.scrollTop = box.scrollHeight;
+}
+
 setLang('id');
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
