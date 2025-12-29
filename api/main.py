@@ -1,4 +1,4 @@
-Import os
+import os
 import io
 import requests
 from flask import Flask, render_template, request, jsonify, send_file
@@ -120,3 +120,4 @@ def chat():
         return jsonify({"reply": f"System Error: {str(e)}"})
 
 app = app
+
