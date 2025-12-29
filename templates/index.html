@@ -1,53 +1,38 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>CATOVISION AI</title>
-    <style>
-        :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; --ai-bubble: rgba(30, 41, 59, 0.5); }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 20px; }
-        
-        /* Navbar & Navigasi */
-        .nav-bar { display: flex; gap: 10px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-        .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
-        .nav-item.active { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); }
-
-        /* Pemilih Bahasa */
-        .lang-selector { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 5px; }
-        .lang-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
-        .lang-btn.active { border-color: var(--accent); color: var(--accent); }
-
-        .container { max-width: 700px; margin: auto; padding: 0 15px; }
-        .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.4s ease; }
-
-        /* Kartu Profil & Home */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; }
-        .ca-box { background: rgba(30, 41, 59, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 11px; word-break: break-all; border: 1px dashed var(--accent); color: var(--accent); margin: 15px 0; }
-        .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
-        
-        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .cat-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); }
-
-        /* Sistem Chat */
-        .chat-container { display: flex; flex-direction: column; height: 75vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .ai-bubble { align-self: flex-start; background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13px; max-width: 90%; line-height: 1.6; }
-        .user-bubble { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 13px; font-weight: bold; }
-
-        /* Quick Actions (Tombol Pintas Akurat) */
-        .quick-actions { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; background: #070a13; flex-shrink: 0; }
-        .btn-quick { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; font-weight: 600; }
-
-        /* Area Input */
-        .input-wrapper { padding: 12px; background: #070a13; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; width: 100%; }
-        #userQuery { background: #1e293b; border: 1px solid var(--border); color: #fff; flex: 1; min-width: 0; padding: 10px 15px; border-radius: 20px; outline: none; }
-        .btn-send { background: var(--accent); border: none; width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CATOVISION AI</title>
+  <style>
+    :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; --ai-bubble: rgba(30, 41, 59, 0.5); }
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+    .nav-bar { display: flex; gap: 10px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+    .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+    .nav-item.active { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .lang-selector { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 5px; }
+    .lang-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+    .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+    .container { max-width: 700px; margin: auto; padding: 0 15px; }
+    .section { display: none; }
+    .section.active { display: block; animation: fadeIn 0.4s ease; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; }
+    .ca-box { background: rgba(30, 41, 59, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 13px; word-break: break-all; border: 1px dashed var(--accent); color: var(--accent); }
+    .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
+    .chat-container { display: flex; flex-direction: column; height: 70vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    .ai-bubble { align-self: flex-start; background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13.5px; border: 1px solid rgba(255,255,255,0.05); max-width: 90%; line-height: 1.5; }
+    .user-bubble { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 14px; font-weight: 500; }
+    .input-wrapper { padding: 15px; background: #070a13; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    .input-wrapper input { background: #1e293b; border: 1px solid var(--border); color: #fff; flex: 1; padding: 10px 15px; border-radius: 20px; outline: none; }
+    .btn-send { background: var(--accent); border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    .quick-actions { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; }
+    .btn-quick { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; }
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+    .cat-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
 </head>
 <body>
 
@@ -66,7 +51,7 @@
 <div class="container">
     <div id="home" class="section active">
         <div class="card">
-            <img src="/static/uploads/100003748.jpg" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover;">
+            <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px;">
             <h1>$CATON</h1>
             <p id="h-desc">Meme coin pertama di ekosistem paxi L1 dengan utilitas AI</p>
             <div class="ca-box">paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9</div>
@@ -82,132 +67,113 @@
     <div id="ai" class="section">
         <div class="chat-container">
             <div id="chatMessages" class="chat-messages">
-                <div class="ai-bubble" id="ai-greet"><strong>CATOVISION Analyst</strong><br>Analis Kripto Profesional. Gunakan parameter teknikal di bawah untuk hasil akurat.</div>
+                <div class="ai-bubble" id="ai-greet"><strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset untuk analisis market.</div>
             </div>
-            
             <div class="quick-actions">
-                <button class="btn-quick" id="q1" onclick="quickQuery('BTC')">📈 BTC Price Action</button>
-                <button class="btn-quick" id="q2" onclick="quickQuery('SOL')">🎯 SOL Scalping Setup</button>
-                <button class="btn-quick" id="q3" onclick="quickQuery('ETH')">💎 ETH Liquidity Levels</button>
+                <button class="btn-quick" id="q1" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Analisa Market Structure BTC">📊 Analisa BTC</button>
+                <button class="btn-quick" id="q2" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Rekomendasi posisi SOL">🎯 Sinyal SOL</button>
+                <button class="btn-quick" id="q3" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Support & Demand ETH">💎 Level ETH</button>
             </div>
-
             <div class="input-wrapper">
-                <input id="imageInput" type="file" accept="image/*" style="display:none;" onchange="alert('Gambar siap dianalisis!')">
-                <button onclick="document.getElementById('imageInput').click()" style="background:none; border:none; cursor:pointer; font-size:18px;">📎</button>
-                <input id="userQuery" type="text" placeholder="Tanyakan market..." autocomplete="off">
-                <button class="btn-send" onclick="askAI()">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
+                <input id="userQuery" type="text" placeholder="...">
+                <button class="btn-send" onclick="askAI()">Send</button>
             </div>
         </div>
     </div>
 
     <div id="clear" class="section">
         <div class="card">
-            <h3 id="e-title">✨ AI Photo Enhancer</h3>
+            <h2 id="e-title">✨ AI Photo Enhancer</h2>
             <form action="/enhance" method="post" enctype="multipart/form-data">
-                <input type="file" name="photo" accept="image/*" required style="display:block; width:100%; margin:15px 0; color:white;">
-                <button type="submit" class="btn-tg" style="width:100%; border:none; cursor:pointer;" id="e-btn">Proses Gambar HD</button>
+                <input type="file" name="photo" accept="image/*" required style="display:block; width:100%; margin:20px 0;">
+                <button type="submit" class="btn-tg" style="width:100%; border:none; cursor:pointer;" id="e-btn">Process HD</button>
             </form>
         </div>
     </div>
 </div>
 
 <script>
-    let curLang = 'id';
-    const trans = {
-        id: { 
-            h_desc: "Meme coin pertama di ekosistem paxi L1", 
-            h_tg: "Gabung Telegram", 
-            ai_greet: "<strong>CATOVISION</strong><br>Analisis market kripto 100% akurat siap.", 
-            loading: "Menghitung parameter teknikal...", 
-            q1: "📈 BTC Price Action", 
-            q2: "🎯 SOL Scalping Setup", 
-            q3: "💎 ETH Liquidity Levels" 
-        },
-        en: { 
-            h_desc: "First meme coin on paxi L1", 
-            h_tg: "Join Telegram", 
-            ai_greet: "<strong>CATOVISION</strong><br>Professional technical analysis ready.", 
-            loading: "Calculating technical parameters...", 
-            q1: "📈 BTC Price Action", 
-            q2: "🎯 SOL Scalping Setup", 
-            q3: "💎 ETH Liquidity Levels" 
-        },
-        zh: { 
-            h_desc: "Paxi L1 首个模因币", 
-            h_tg: "加入 Telegram", 
-            ai_greet: "<strong>CATOVISION</strong><br>专业技术分析已就绪。", 
-            loading: "计算技术参数中...", 
-            q1: "📈 BTC 价格行为", 
-            q2: "🎯 SOL 剥头皮设置", 
-            q3: "💎 ETH 流动性水平" 
+const trans = {
+    id: { h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset untuk analisis market.", e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH", loading: "CATOVISION sedang menganalisis...", error: "Gagal memuat data." },
+    en: { h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Hello Trader, provide an asset name for market analysis.", e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand", loading: "CATOVISION is analyzing...", error: "Failed to load data." },
+    zh: { h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行分析。", e_title: "✨ AI 照片增强器", e_btn: "处理高清", q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区", loading: "CATO 正在分析中...", error: "数据加载错误。" }
+};
+
+let curLang = 'id';
+
+function setLang(l, btn) {
+    curLang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    
+    document.getElementById('h-desc').innerText = trans[l].h_desc;
+    document.getElementById('h-tg').innerText = trans[l].h_tg;
+    document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
+    document.getElementById('e-title').innerText = trans[l].e_title;
+    document.getElementById('e-btn').innerText = trans[l].e_btn;
+    
+    // Update Quick Actions Text
+    const b1 = document.getElementById('q1'); b1.innerText = trans[l].q1; b1.setAttribute('data-q', trans[l].q1q);
+    const b2 = document.getElementById('q2'); b2.innerText = trans[l].q2; b2.setAttribute('data-q', trans[l].q2q);
+    const b3 = document.getElementById('q3'); b3.innerText = trans[l].q3; b3.setAttribute('data-q', trans[l].q3q);
+}
+
+function showTab(btn, id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(btn) btn.classList.add('active');
+}
+
+function typeEffect(element, text) {
+    let i = 0;
+    element.innerHTML = "";
+    function type() {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+            i++;
+            setTimeout(type, 15);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
         }
-    };
-
-    function setLang(l, btn) {
-        curLang = l;
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('h-desc').innerText = trans[l].h_desc;
-        document.getElementById('h-tg').innerText = trans[l].h_tg;
-        document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
-        document.getElementById('q1').innerText = trans[l].q1;
-        document.getElementById('q2').innerText = trans[l].q2;
-        document.getElementById('q3').innerText = trans[l].q3;
     }
+    type();
+}
 
-    function showTab(btn, id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+async function askAI() {
+    const input = document.getElementById('userQuery');
+    const box = document.getElementById('chatMessages');
+    const val = input.value.trim();
+    if(!val) return;
+
+    box.innerHTML += `<div class="user-bubble">${val}</div>`;
+    input.value = '';
+    
+    const loadId = "L" + Date.now();
+    box.innerHTML += `<div class="ai-bubble" id="${loadId}">${trans[curLang].loading}</div>`;
+    box.scrollTop = box.scrollHeight;
+
+    try {
+        const fd = new FormData();
+        fd.append('query', val);
+        fd.append('lang', curLang);
+        const res = await fetch('/chat', { method: 'POST', body: fd });
+        const data = await res.json();
+        typeEffect(document.getElementById(loadId), data.reply);
+    } catch (e) {
+        document.getElementById(loadId).innerText = trans[curLang].error;
     }
+}
 
-    // Fungsi Quick Query disesuaikan dengan terminologi teknis trading yang akurat
-    function quickQuery(asset) {
-        let prompt = "";
-        if (asset === 'BTC') {
-            prompt = curLang === 'id' ? "Analisis Price Action Bitcoin (BTC). Identifikasi Major Market Structure (MS), tren saat ini, dan potensi Breakout atau Rejection di zona Supply/Demand." : 
-                     curLang === 'zh' ? "分析比特币 (BTC) 的价格行为。识别主要的市场结构 (MS)、当前趋势以及供应/需求区的潜在突破或拒绝。" :
-                     "Analyze Bitcoin (BTC) Price Action. Identify Major Market Structure (MS), current trend, and potential Breakout or Rejection at Supply/Demand zones.";
-        } else if (asset === 'SOL') {
-            prompt = curLang === 'id' ? "Berikan Scalping Setup untuk Solana (SOL). Tentukan zona High Probability Entry berdasarkan Fibonacci Retracement, RSI, dan target Profit Take (TP) serta Stop Loss (SL) yang ketat." : 
-                     curLang === 'zh' ? "提供 Solana (SOL) 的剥头皮交易设置。根据斐波那契回调、RSI 确定高概率入场区域，并设定严格的止盈 (TP) 和止损 (SL) 目标。" :
-                     "Provide a Scalping Setup for Solana (SOL). Determine High Probability Entry zones based on Fibonacci Retracement, RSI, and set tight Take Profit (TP) and Stop Loss (SL) targets.";
-        } else if (asset === 'ETH') {
-            prompt = curLang === 'id' ? "Tentukan Key Liquidity Levels untuk Ethereum (ETH). Analisis area Support/Resistance horizontal dan identifikasi di mana terdapat penumpukan order (Order Block) yang signifikan hari ini." : 
-                     curLang === 'zh' ? "确定以太坊 (ETH) 的关键流动性水平。分析水平支撑/阻力区域，并识别今天存在显著订单块 (Order Block) 的区域。" :
-                     "Define Key Liquidity Levels for Ethereum (ETH). Analyze horizontal Support/Resistance areas and identify where significant Order Blocks are located today.";
-        }
-        
-        document.getElementById('userQuery').value = prompt;
-        askAI();
-    }
+function quickQuery(q) {
+    document.getElementById('userQuery').value = q;
+    askAI();
+}
 
-    async function askAI() {
-        const input = document.getElementById('userQuery');
-        const box = document.getElementById('chatMessages');
-        const val = input.value.trim();
-        if(!val) return;
-
-        box.innerHTML += `<div class="user-bubble">${val}</div>`;
-        input.value = '';
-        const loadId = "L" + Date.now();
-        box.innerHTML += `<div class="ai-bubble" id="${loadId}">${trans[curLang].loading}</div>`;
-        box.scrollTop = box.scrollHeight;
-
-        try {
-            const fd = new FormData();
-            fd.append('query', val); 
-            fd.append('lang', curLang);
-            const res = await fetch('/chat', { method: 'POST', body: fd });
-            const data = await res.json();
-            document.getElementById(loadId).innerHTML = data.reply.replace(/\n/g, '<br>');
-            box.scrollTop = box.scrollHeight;
-        } catch (e) { document.getElementById(loadId).innerText = "Gagal memproses analisis."; }
-    }
+setLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
+
+
 
