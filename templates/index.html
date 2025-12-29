@@ -94,9 +94,39 @@
 
 <script>
 const trans = {
-    id: { h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset untuk analisis market.", e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH", loading: "CATOVISION sedang menganalisis...", error: "Gagal memuat data." },
-    en: { h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Hello Trader, provide an asset name for market analysis.", e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand", loading: "CATOVISION is analyzing...", error: "Failed to load data." },
-    zh: { h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行分析。", e_title: "✨ AI 照片增强器", e_btn: "处理高清", q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区", loading: "CATO 正在分析中...", error: "数据加载错误。" }
+    id: { 
+        h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", 
+        h_tg: "Gabung Telegram", 
+        ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama koin untuk analisis crypto market structure & zone.", 
+        e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", 
+        q1: "📊 Analisa BTC", q1q: "Analisa Market Structure koin crypto Bitcoin (BTC) saat ini.", 
+        q2: "🎯 Sinyal SOL", q2q: "Berikan rekomendasi posisi trading dan zona entry koin crypto Solana (SOL).", 
+        q3: "💎 Level ETH", q3q: "Berikan area support dan demand koin crypto Ethereum (ETH) hari ini.", 
+        loading: "CATOVISION sedang menganalisis...", 
+        error: "Gagal memuat data." 
+    },
+    en: { 
+        h_desc: "First meme coin on paxi ecosystem L1 with AI utility", 
+        h_tg: "Join Telegram", 
+        ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Hello Trader, provide a coin name for crypto market structure & zone analysis.", 
+        e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", 
+        q1: "📊 BTC Analysis", q1q: "Analyze current Bitcoin (BTC) crypto Market Structure and trend.", 
+        q2: "🎯 SOL Signal", q2q: "Provide trading position recommendations and entry zones for Solana (SOL) crypto.", 
+        q3: "💎 ETH Levels", q3q: "Provide support and demand areas for Ethereum (ETH) crypto today.", 
+        loading: "CATOVISION is analyzing...", 
+        error: "Failed to load data." 
+    },
+    zh: { 
+        h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", 
+        h_tg: "加入 Telegram", 
+        ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入币种名称进行加密货币分析。", 
+        e_title: "✨ AI 照片增强器", e_btn: "处理高清", 
+        q1: "📊 BTC 分析", q1q: "分析当前比特币 (BTC) 加密货币的市场结构和趋势。", 
+        q2: "🎯 SOL 信号", q2q: "提供 Solana (SOL) 加密货币的交易建议和入场区域。", 
+        q3: "💎 ETH 层级", q3q: "提供今日以太坊 (ETH) 加密货币的支撑位和需求区。", 
+        loading: "CATO 正在分析中...", 
+        error: "数据加载错误。" 
+    }
 };
 
 let curLang = 'id';
@@ -173,6 +203,7 @@ setLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
