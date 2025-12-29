@@ -4,17 +4,14 @@ import requests
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image, ImageEnhance
 
-# Inisialisasi Flask
 app = Flask(__name__, 
             template_folder='../templates', 
             static_folder='../static')
 
-# Ambil API Key dari Environment Variable Vercel
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route("/")
 def index():
-    """Halaman Utama"""
     koleksi_kucing = [
         {"id": 1, "name": "Green Cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "Turquoise Cat", "img": "1000037421.jpg"},
@@ -23,36 +20,28 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur Photo Enhancer"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
-    
     try:
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
-        
-        # Sharpness & Contrast enhancement
         img = ImageEnhance.Sharpness(img).enhance(2.5)
         img = ImageEnhance.Contrast(img).enhance(1.4)
-        
         img_io = io.BytesIO()
         img.save(img_io, 'JPEG', quality=95)
         img_io.seek(0)
-        
         return send_file(img_io, mimetype='image/jpeg', as_attachment=True, download_name="CATO_HD.jpg")
     except Exception as e:
         return f"Error: {str(e)}", 500
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst dengan integrasi CoinGecko"""
     user_query = request.form.get('query')
     lang = request.form.get('lang', 'id')
     
     if not GROQ_API_KEY:
-        return jsonify({"reply": "Konfigurasi Error: API Key Groq tidak ditemukan."})
+        return jsonify({"reply": "API Key Groq tidak ditemukan."})
 
-    # Mengambil Data Market dari CoinGecko (dengan proteksi timeout)
     market_context = ""
     try:
         search_res = requests.get(f"https://api.coingecko.com/api/v3/search?query={user_query}", timeout=3).json()
@@ -63,27 +52,23 @@ def chat():
                 data = p_res[coin_id]
                 market_context = f"[Harga {coin_id}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)]"
     except Exception:
-        market_context = "" # Jika API harga gagal, AI tetap lanjut menjawab
+        market_context = ""
 
     try:
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         payload = {
-            "model": "llama-3.3-70b-versatile", # Menggunakan model terbaru yang didukung
+            "model": "llama-3.3-70b-versatile",
             "messages": [
                 {"role": "system", "content": f"You are CATOVISION AI. You are a crypto expert. Answer in {lang}."},
                 {"role": "user", "content": f"Context: {market_context}\nQuery: {user_query}"}
             ],
             "temperature": 0.6
         }
-        
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=15)
         res_json = response.json()
-        
         if response.status_code == 200 and 'choices' in res_json:
             return jsonify({"reply": res_json['choices'][0]['message']['content']})
-        
-        return jsonify({"reply": "CATOVISION AI sedang sibuk memproses data. Coba lagi sebentar lagi."})
-
+        return jsonify({"reply": "Error: API sedang sibuk."})
     except Exception as e:
         return jsonify({"reply": f"Error sistem: {str(e)}"})
 
