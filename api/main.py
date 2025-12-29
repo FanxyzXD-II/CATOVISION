@@ -23,7 +23,7 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur Photo Enhancer"""
+    """Fitur Photo Enhancer - TETAP DIPERTAHANKAN"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     
@@ -31,7 +31,7 @@ def enhance_photo():
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # Sharpness & Contrast
+        # Proses penjernihan gambar (Sharpness & Contrast)
         img = ImageEnhance.Sharpness(img).enhance(2.5)
         img = ImageEnhance.Contrast(img).enhance(1.4)
         
@@ -45,43 +45,48 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst"""
+    """Fitur AI Analyst - Perbaikan agar tidak 'Sibuk'"""
     user_query = request.form.get('query')
     lang = request.form.get('lang', 'id')
     
     if not GROQ_API_KEY:
-        return jsonify({"reply": "API Key tidak terdeteksi di server."})
+        return jsonify({"reply": "API Key Groq tidak ditemukan di Environment Variables Vercel."})
 
     try:
-        # Ambil Data Market
-        market_context = ""
-        search_res = requests.get(f"https://api.coingecko.com/api/v3/search?query={user_query}").json()
+        # Menghapus bagian CoinGecko yang lambat dan sering error
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}", 
+            "Content-Type": "application/json"
+        }
         
-        if search_res.get('coins'):
-            coin_id = search_res['coins'][0]['id']
-            p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true").json()
-            if coin_id in p_res:
-                data = p_res[coin_id]
-                market_context = f"Harga {coin_id}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)"
-
-        # Request ke Groq
-        headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         payload = {
             "model": "llama3-70b-8192",
             "messages": [
-                {"role": "system", "content": f"You are CATOVISION AI. Answer in {lang}."},
-                {"role": "user", "content": f"Query: {user_query}. Context: {market_context}"}
+                {"role": "system", "content": f"You are CATOVISION AI. You are a crypto expert. Answer in {lang}."},
+                {"role": "user", "content": user_query}
             ],
             "temperature": 0.5
         }
         
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload).json()
+        # Request ke Groq dengan timeout agar tidak menggantung
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions", 
+            headers=headers, 
+            json=payload,
+            timeout=10
+        )
         
-        if 'choices' in response:
-            return jsonify({"reply": response['choices'][0]['message']['content']})
-        return jsonify({"reply": "CATOVISION AI sedang sibuk. Coba lagi nanti."})
+        res_json = response.json()
+        
+        if response.status_code == 200 and 'choices' in res_json:
+            return jsonify({"reply": res_json['choices'][0]['message']['content']})
+        
+        # Menampilkan pesan error spesifik jika API bermasalah
+        error_msg = res_json.get('error', {}).get('message', 'AI sedang sibuk atau limit tercapai.')
+        return jsonify({"reply": f"CATOVISION Error: {error_msg}"})
 
     except Exception as e:
         return jsonify({"reply": f"Error sistem: {str(e)}"})
 
+# Diperlukan untuk deployment Vercel
 app = app
