@@ -5,209 +5,257 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CATOVISION AI</title>
   <style>
-    :root { --bg:#020617; --card:#0f172a; --text:#f8fafc; --accent:#38bdf8; --border:#1e293b; --ai-bubble: rgba(30, 41, 59, 0.5); }
+    :root { 
+      --bg: #020617; 
+      --card: #0f172a; 
+      --text: #f8fafc; 
+      --accent: #38bdf8; 
+      --border: #1e293b; 
+      --ai-bubble: rgba(30, 41, 59, 0.5); 
+    }
+
     * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
     body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
-    .nav-bar { display: flex; gap: 10px; padding: 15px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-    .nav-item { cursor: pointer; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+
+    .nav-bar { 
+      display: flex; gap: 10px; padding: 15px; 
+      background: var(--card); border-bottom: 1px solid var(--border); 
+      position: sticky; top: 0; z-index: 100; overflow-x: auto; 
+    }
+    .nav-item { 
+      cursor: pointer; padding: 8px 16px; border-radius: 10px; 
+      font-size: 13px; font-weight: 600; color: #94a3b8; white-space: nowrap; 
+    }
     .nav-item.active { background: rgba(56, 189, 248, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+
     .lang-selector { display: flex; justify-content: flex-end; padding: 10px 20px; gap: 5px; }
     .lang-btn { background: var(--card); border: 1px solid var(--border); color: #fff; padding: 4px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
     .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+
     .container { max-width: 700px; margin: auto; padding: 0 15px; }
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.4s ease; }
+
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; text-align: center; margin-bottom: 20px; }
-    .ca-box { background: rgba(30, 41, 59, 0.7); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 13px; word-break: break-all; border: 1px dashed var(--accent); color: var(--accent); }
-    .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; margin-top: 15px; }
-    .chat-container { display: flex; flex-direction: column; height: 70vh; background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-    .ai-bubble { align-self: flex-start; background: var(--ai-bubble); padding: 15px; border-radius: 0 15px 15px 15px; font-size: 13.5px; border: 1px solid rgba(255,255,255,0.05); max-width: 90%; line-height: 1.5; }
-    .user-bubble { align-self: flex-end; background: var(--accent); color: #000; padding: 10px 15px; border-radius: 15px 15px 0 15px; font-size: 14px; font-weight: 500; max-width: 85%; }
-    .input-wrapper { padding: 15px; background: #070a13; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: center; }
-    .input-wrapper input { background: #1e293b; border: 1px solid var(--border); color: #fff; flex: 1; padding: 10px 15px; border-radius: 20px; outline: none; }
-    .btn-send { background: var(--accent); border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-    .quick-actions { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; }
-    .btn-quick { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; }
-    .preview-box { padding: 5px 20px; display: none; background: #070a13; border-top: 1px solid var(--border); }
-    .preview-box img { height: 60px; border-radius: 10px; border: 1px solid var(--accent); }
+    .ca-box { 
+      background: rgba(30, 41, 59, 0.7); padding: 12px; border-radius: 12px; 
+      font-family: monospace; font-size: 13px; word-break: break-all; 
+      border: 1px dashed var(--accent); color: var(--accent); margin: 15px 0;
+    }
+    .btn-tg { background: #0088cc; color: #fff; text-decoration: none; display: block; padding: 14px; border-radius: 12px; font-weight: bold; }
+    
     .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
     .cat-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid var(--border); }
+
+    .chat-container { 
+      display: flex; flex-direction: column; height: 75vh; 
+      background: #070a13; border-radius: 28px; border: 1px solid var(--border); overflow: hidden; 
+    }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    
+    /* Bubble Chat Styles */
+    .ai-bubble { 
+      align-self: flex-start; background: var(--ai-bubble); padding: 15px; 
+      border-radius: 0 15px 15px 15px; font-size: 13.5px; 
+      border: 1px solid rgba(255,255,255,0.05); max-width: 90%; white-space: pre-wrap; 
+    }
+    .user-bubble { 
+      align-self: flex-end; background: var(--accent); color: #000; 
+      padding: 12px 18px; border-radius: 18px 18px 0 18px; font-size: 14px; font-weight: 500; max-width: 85%; 
+    }
+    .chat-img { width: 100%; border-radius: 12px; margin-top: 8px; border: 1px solid rgba(0,0,0,0.1); }
+
+    .preview-pane { display: none; padding: 10px 20px; background: #0f172a; border-top: 1px solid var(--border); position: relative; }
+    .preview-pane img { height: 75px; border-radius: 10px; border: 2px solid var(--accent); }
+    
+    .quick-actions { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; }
+    .btn-quick { 
+      background: rgba(56, 189, 248, 0.05); border: 1px solid var(--accent); color: var(--accent); 
+      padding: 8px 14px; border-radius: 12px; font-size: 11px; white-space: nowrap; cursor: pointer; 
+    }
+
+    .input-wrapper { 
+      padding: 15px; background: #070a13; border-top: 1px solid var(--border); 
+      display: flex; gap: 10px; align-items: center; width: 100%;
+    }
+    .input-wrapper input[type="text"] { 
+      background: #1e293b; border: 1px solid var(--border); color: #fff; 
+      flex: 1; min-width: 0; padding: 12px 18px; border-radius: 25px; outline: none; 
+    }
+    .btn-send { 
+      background: var(--accent); border: none; padding: 10px 20px; 
+      border-radius: 25px; font-weight: bold; cursor: pointer; flex-shrink: 0;
+    }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
-<div class="nav-bar">
+  <div class="nav-bar">
     <div class="nav-item active" onclick="showTab(this, 'home')">🏠 Home</div>
     <div class="nav-item" onclick="showTab(this, 'ai')">📊 AI Analyst</div>
     <div class="nav-item" onclick="showTab(this, 'clear')">✨ AI Enhancer</div>
-</div>
+  </div>
 
-<div class="lang-selector">
+  <div class="lang-selector">
     <button class="lang-btn active" onclick="setLang('id', this)">🇲🇨ID</button>
     <button class="lang-btn" onclick="setLang('en', this)">🇺🇲EN</button>
     <button class="lang-btn" onclick="setLang('zh', this)">🇨🇳ZH</button>
-</div>
+  </div>
 
-<div class="container">
+  <div class="container">
+    
     <div id="home" class="section active">
-        <div class="card">
-            <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px;">
-            <h1>$CATON</h1>
-            <p id="h-desc">Meme coin pertama di ekosistem paxi L1 dengan utilitas AI</p>
-            <div class="ca-box">paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9</div>
-            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-tg">Gabung Telegram</a>
-        </div>
-        <div class="cat-grid">
-            {% for cat in cats %}
-            <div class="cat-card"><img src="/static/uploads/{{ cat.img }}"></div>
-            {% endfor %}
-        </div>
+      <div class="card">
+        <img src="/static/uploads/100003748.jpg" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px;">
+        <h1>$CATON</h1>
+        <p id="h-desc">Meme coin pertama di ekosistem paxi L1 dengan utilitas AI</p>
+        <div class="ca-box">paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9</div>
+        <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-tg">Gabung Telegram</a>
+      </div>
+      <div class="cat-grid">
+        {% for cat in cats %}
+        <div class="cat-card"><img src="/static/uploads/{{ cat.img }}"></div>
+        {% endfor %}
+      </div>
     </div>
 
     <div id="ai" class="section">
-        <div class="chat-container">
-            <div id="chatMessages" class="chat-messages">
-                <div class="ai-bubble" id="ai-greet"><strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset atau unggah chart untuk analisis market.</div>
-            </div>
-            
-            <div id="previewBox" class="preview-box">
-                <img id="imgView" src="">
-                <button onclick="cancelImg()" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
-            </div>
-
-            <div class="quick-actions">
-                <button class="btn-quick" id="q1" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Analisa Market Structure BTC">📊 Analisa BTC</button>
-                <button class="btn-quick" id="q2" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Rekomendasi posisi SOL">🎯 Sinyal SOL</button>
-                <button class="btn-quick" id="q3" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Support & Demand ETH">💎 Level ETH</button>
-            </div>
-            <div class="input-wrapper">
-                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleImg()">
-                <button onclick="document.getElementById('fileInput').click()" style="background:none; border:none; font-size:20px; cursor:pointer;">🖼️</button>
-                <input id="userQuery" type="text" placeholder="...">
-                <button class="btn-send" onclick="askAI()">Send</button>
-            </div>
+      <div class="chat-container">
+        <div id="chatMessages" class="chat-messages">
+          <div class="ai-bubble" id="ai-greet"><strong>CATOVISION AI</strong><br>Halo! Ada yang bisa saya bantu hari ini? Anda bisa mengirim pesan atau unggah gambar untuk saya analisa.</div>
         </div>
+        
+        <div id="previewPane" class="preview-pane">
+          <img id="imgPre" src="">
+          <button onclick="delImg()" style="background:red; color:white; border:none; border-radius:50%; position:absolute; left:85px; top:5px; width:22px; height:22px; cursor:pointer;">✕</button>
+        </div>
+
+        <div class="quick-actions">
+          <button class="btn-quick" id="q1" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Analisa Market Structure BTC">📊 Analisa BTC</button>
+          <button class="btn-quick" id="q2" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Rekomendasi posisi SOL">🎯 Sinyal SOL</button>
+          <button class="btn-quick" id="q3" onclick="quickQuery(this.getAttribute('data-q'))" data-q="Support & Demand ETH">💎 Level ETH</button>
+        </div>
+
+        <div class="input-wrapper">
+          <input type="file" id="fileIn" accept="image/*" style="display:none" onchange="loadImg()">
+          <button onclick="document.getElementById('fileIn').click()" style="background:none; border:none; font-size:24px; cursor:pointer;">📎</button>
+          <input id="userIn" type="text" placeholder="Ketik pesan...">
+          <button class="btn-send" onclick="sendToAI()">Send</button>
+        </div>
+      </div>
     </div>
 
     <div id="clear" class="section">
-        <div class="card">
-            <h2 id="e-title">✨ AI Photo Enhancer</h2>
-            <form action="/enhance" method="post" enctype="multipart/form-data">
-                <input type="file" name="photo" accept="image/*" required style="display:block; width:100%; margin:20px 0;">
-                <button type="submit" class="btn-tg" style="width:100%; border:none; cursor:pointer;" id="e-btn">Process HD</button>
-            </form>
-        </div>
+      <div class="card">
+        <h2 id="e-title">✨ AI Photo Enhancer</h2>
+        <form action="/enhance" method="post" enctype="multipart/form-data">
+          <input type="file" name="photo" accept="image/*" required style="display:block; width:100%; margin:20px 0;">
+          <button type="submit" class="btn-tg" style="width:100%; border:none; cursor:pointer;" id="e-btn">Process HD</button>
+        </form>
+      </div>
     </div>
-</div>
 
-<script>
-const trans = {
-    id: { h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset atau unggah chart untuk analisis market.", e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH", loading: "CATOVISION sedang menganalisis...", error: "Gagal memuat data." },
-    en: { h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram", ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Hello Trader, provide an asset name or upload a chart for analysis.", e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand", loading: "CATOVISION is analyzing...", error: "Failed to load data." },
-    zh: { h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", h_tg: "加入 Telegram", ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称或上传图表进行分析。", e_title: "✨ AI 照片增强器", e_btn: "处理高清", q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区", loading: "CATO 正在分析中...", error: "数据加载错误。" }
-};
+  </div>
 
-let curLang = 'id';
+  <script>
+    const trans = {
+      id: { h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", h_tg: "Gabung Telegram", ai_greet: "<strong>CATOVISION AI</strong><br>Halo! Ada yang bisa saya bantu hari ini? Anda bisa mengirim pesan atau unggah chart untuk saya analisa.", e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", q3: "💎 Level ETH", q3q: "Support & Demand ETH", loading: "Sedang menganalisis..." },
+      en: { h_desc: "First meme coin on paxi ecosystem L1 with AI utility", h_tg: "Join Telegram", ai_greet: "<strong>CATOVISION AI</strong><br>Hello! How can I help you today? You can send a message or upload a chart for analysis.", e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", q2: "🎯 SOL Signal", q2q: "SOL position recommendation", q3: "💎 ETH Levels", q3q: "ETH Support & Demand", loading: "Analyzing..." },
+      zh: { h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具 di模因币", h_tg: "加入 Telegram", ai_greet: "<strong>CATOVISION AI</strong><br>您好！今天有什么我可以帮您的吗？您可以发送消息或上传图表进行分析。", e_title: "✨ AI 照片增强器", e_btn: "处理高清", q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区", loading: "正在分析..." }
+    };
 
-function setLang(l, btn) {
-    curLang = l;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    
-    document.getElementById('h-desc').innerText = trans[l].h_desc;
-    document.getElementById('h-tg').innerText = trans[l].h_tg;
-    document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
-    document.getElementById('e-title').innerText = trans[l].e_title;
-    document.getElementById('e-btn').innerText = trans[l].e_btn;
-    
-    const b1 = document.getElementById('q1'); b1.innerText = trans[l].q1; b1.setAttribute('data-q', trans[l].q1q);
-    const b2 = document.getElementById('q2'); b2.innerText = trans[l].q2; b2.setAttribute('data-q', trans[l].q2q);
-    const b3 = document.getElementById('q3'); b3.innerText = trans[l].q3; b3.setAttribute('data-q', trans[l].q3q);
-}
+    let curLang = 'id';
+    let upFile = null;
 
-function showTab(btn, id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if(btn) btn.classList.add('active');
-}
+    function setLang(l, btn) {
+      curLang = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      document.getElementById('h-desc').innerText = trans[l].h_desc;
+      document.getElementById('h-tg').innerText = trans[l].h_tg;
+      document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
+      document.getElementById('e-title').innerText = trans[l].e_title;
+      document.getElementById('e-btn').innerText = trans[l].e_btn;
+      const b1 = document.getElementById('q1'); b1.innerText = trans[l].q1; b1.setAttribute('data-q', trans[l].q1q);
+      const b2 = document.getElementById('q2'); b2.innerText = trans[l].q2; b2.setAttribute('data-q', trans[l].q2q);
+      const b3 = document.getElementById('q3'); b3.innerText = trans[l].q3; b3.setAttribute('data-q', trans[l].q3q);
+    }
 
-function handleImg() {
-    const file = document.getElementById('fileInput').files[0];
-    if (file) {
+    function showTab(btn, id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if(btn) btn.classList.add('active');
+    }
+
+    function loadImg() {
+      const file = document.getElementById('fileIn').files[0];
+      if (file) {
+        upFile = file;
         const reader = new FileReader();
         reader.onload = e => {
-            document.getElementById('imgView').src = e.target.result;
-            document.getElementById('previewBox').style.display = 'block';
+          document.getElementById('imgPre').src = e.target.result;
+          document.getElementById('previewPane').style.display = 'block';
         };
         reader.readAsDataURL(file);
+      }
     }
-}
 
-function cancelImg() {
-    document.getElementById('fileInput').value = "";
-    document.getElementById('previewBox').style.display = 'none';
-}
-
-function typeEffect(element, text) {
-    let i = 0;
-    element.innerHTML = "";
-    function type() {
-        if (i < text.length) {
-            element.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
-            i++;
-            setTimeout(type, 15);
-            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-        }
+    function delImg() {
+      upFile = null;
+      document.getElementById('fileIn').value = "";
+      document.getElementById('previewPane').style.display = 'none';
     }
-    type();
-}
 
-async function askAI() {
-    const input = document.getElementById('userQuery');
-    const fileInput = document.getElementById('fileInput');
-    const box = document.getElementById('chatMessages');
-    const val = input.value.trim();
-    
-    if(!val && !fileInput.files[0]) return;
+    async function sendToAI() {
+      const input = document.getElementById('userIn');
+      const box = document.getElementById('chatMessages');
+      const val = input.value.trim();
+      
+      if(!val && !upFile) return;
 
-    let userHtml = `<div class="user-bubble">${val}`;
-    if(fileInput.files[0]) {
-        userHtml += `<br><img src="${document.getElementById('imgView').src}" style="width:100%; border-radius:10px; margin-top:8px;">`;
-    }
-    userHtml += `</div>`;
-    box.innerHTML += userHtml;
+      // Logika untuk menampilkan gambar di gelembung chat user
+      let userHtml = `<div class="user-bubble">`;
+      if(upFile) {
+          const imgUrl = document.getElementById('imgPre').src;
+          userHtml += `<img src="${imgUrl}" class="chat-img"><br>`;
+      }
+      userHtml += `<span>${val}</span></div>`;
+      
+      box.innerHTML += userHtml;
 
-    const fd = new FormData();
-    fd.append('query', val);
-    fd.append('lang', curLang);
-    if(fileInput.files[0]) fd.append('image', fileInput.files[0]);
+      const fd = new FormData();
+      fd.append('query', val);
+      fd.append('lang', curLang);
+      if(upFile) fd.append('image', upFile);
 
-    input.value = '';
-    cancelImg();
-    
-    const loadId = "L" + Date.now();
-    box.innerHTML += `<div class="ai-bubble" id="${loadId}">${trans[curLang].loading}</div>`;
-    box.scrollTop = box.scrollHeight;
+      input.value = '';
+      const currentImgData = upFile; // Simpan referensi sementara
+      delImg(); // Bersihkan preview
+      
+      const loadId = "L" + Date.now();
+      box.innerHTML += `<div class="ai-bubble" id="${loadId}"><b>${trans[curLang].loading}</b></div>`;
+      box.scrollTop = box.scrollHeight;
 
-    try {
+      try {
         const res = await fetch('/chat', { method: 'POST', body: fd });
         const data = await res.json();
-        typeEffect(document.getElementById(loadId), data.reply);
-    } catch (e) {
-        document.getElementById(loadId).innerText = trans[curLang].error;
+        document.getElementById(loadId).innerHTML = data.reply.replace(/\n/g, '<br>');
+        box.scrollTop = box.scrollHeight;
+      } catch {
+        document.getElementById(loadId).innerText = "Kesalahan koneksi.";
+      }
     }
-}
 
-function quickQuery(q) {
-    document.getElementById('userQuery').value = q;
-    askAI();
-}
+    function quickQuery(q) {
+      document.getElementById('userIn').value = q;
+      sendToAI();
+    }
 
-setLang('id', document.querySelector('.lang-btn'));
-</script>
+    setLang('id', document.querySelector('.lang-btn'));
+  </script>
 </body>
 </html>
 
