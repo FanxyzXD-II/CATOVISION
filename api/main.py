@@ -8,11 +8,12 @@ app = Flask(__name__,
             template_folder='../templates', 
             static_folder='../static')
 
+# Ambil API Key dari Environment Variable Vercel
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route("/")
 def index():
-    """Halaman Utama dengan data foto kucing"""
+    """Halaman Utama dengan data foto kucing - TETAP DIPERTAHANKAN"""
     koleksi_kucing = [
         {"id": 1, "name": "Green Cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "Turquoise Cat", "img": "1000037421.jpg"},
@@ -21,7 +22,7 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur Photo Enhancer"""
+    """Fitur Photo Enhancer - TETAP DIPERTAHANKAN"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
@@ -38,7 +39,7 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst"""
+    """Fitur AI Analyst - Fokus 100% pada Analisa Crypto & Candlestick"""
     user_query = request.form.get('query')
     lang = request.form.get('lang', 'id')
     
@@ -53,25 +54,43 @@ def chat():
             p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true", timeout=3).json()
             if coin_id in p_res:
                 data = p_res[coin_id]
-                market_context = f"[Harga {coin_id}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)]"
+                market_context = f"[Harga {coin_id.upper()}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)]"
     except Exception:
         market_context = ""
 
     try:
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
+        
+        # PROMPT BARU: Memaksa AI fokus pada Crypto, Candlestick, Trend, dan Buy/Sell
+        system_prompt = (
+            f"You are CATOVISION AI, a professional Cryptocurrency technical analyst. "
+            f"Respond 100% in {lang}. Your expertise is strictly limited to: "
+            f"1. Candlestick pattern analysis. "
+            f"2. Market trend analysis (Bullish/Bearish/Side-ways). "
+            f"3. Providing trading signals (Buy/Sell) with Entry, TP, and SL based on Market Structure (BOS, CHoCH). "
+            f"4. Identifying Support and Demand zones. "
+            f"Crucial: If the query is 'SOL', it means Solana Cryptocurrency. Never discuss Linux or non-crypto topics."
+        )
+
         payload = {
             "model": "llama-3.3-70b-versatile",
             "messages": [
-                {"role": "system", "content": f"You are CATOVISION AI expert. Answer in {lang}."},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Context: {market_context}\nQuery: {user_query}"}
             ],
-            "temperature": 0.6
+            "temperature": 0.5 # Temperature rendah agar analisa lebih akurat dan tidak melantur
         }
+        
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=15)
         res_json = response.json()
-        if response.status_code == 200:
+        
+        if response.status_code == 200 and 'choices' in res_json:
             return jsonify({"reply": res_json['choices'][0]['message']['content']})
-        return jsonify({"reply": "AI sedang sibuk."})
+        
+        # Pesan error spesifik jika API bermasalah
+        error_msg = res_json.get('error', {}).get('message', 'AI sedang sibuk.')
+        return jsonify({"reply": f"CATOVISION Error: {error_msg}"})
+
     except Exception as e:
         return jsonify({"reply": f"Error: {str(e)}"})
 
