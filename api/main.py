@@ -9,9 +9,9 @@ app = Flask(__name__,
             template_folder='../templates', 
             static_folder='../static')
 
-# Konfigurasi API Key
-# Disarankan mengisi via Environment Variables di Dashboard Vercel dengan nama 'GROQ_API_KEY'
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
+# KONFIGURASI API KEY (AMAN)
+# Mengambil dari Environment Variables Vercel agar tidak tampil di GitHub.
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route("/")
 def index():
@@ -49,8 +49,11 @@ def enhance_photo():
 def chat():
     """Fitur AI Analyst Pro dengan integrasi data pasar real-time."""
     user_query = request.form.get('query')
-    lang = request.form.get('lang', 'id') # Default ke Indonesia jika tidak ada
+    lang = request.form.get('lang', 'id')
     
+    if not GROQ_API_KEY:
+        return jsonify({"reply": "API Key tidak ditemukan. Harap atur GROQ_API_KEY di Dashboard Vercel."})
+
     if not user_query:
         return jsonify({"reply": "Silakan masukkan pertanyaan atau nama koin."})
 
@@ -67,13 +70,12 @@ def chat():
                 data = price_res[coin_id]
                 market_context = f"Data Pasar {coin_id}: Harga ${data['usd']}, Perubahan 24j: {round(data.get('usd_24h_change', 0), 2)}%."
 
-        # 2. Permintaan ke AI Groq (Llama 3 70B)
+        # 2. Permintaan ke AI Groq
         headers = {
             "Authorization": f"Bearer {GROQ_API_KEY}",
             "Content-Type": "application/json"
         }
         
-        # Menyesuaikan instruksi bahasa berdasarkan input 'lang' dari HTML
         system_instruction = f"You are CATOVISION AI, a pro crypto analyst. Focus on Market Structure and SMC. Answer strictly in {lang} language. End with: Trade with care, NFA."
         
         payload = {
@@ -95,7 +97,5 @@ def chat():
     except Exception as e:
         return jsonify({"reply": f"Terjadi gangguan sistem: {str(e)}"})
 
-# Diperlukan oleh Vercel Serverless
+# Diperlukan oleh Vercel
 app = app
-
-
