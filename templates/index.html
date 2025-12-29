@@ -125,11 +125,12 @@
 </div>
 
 <script>
+// Pastikan objek trans lengkap dan benar
 const trans = {
     id: { 
         h_desc: "Meme coin pertama di ekosistem paxi L1 dengan utilitas AI", 
         h_tg: "Gabung Telegram", 
-        ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Halo Trader, berikan nama aset untuk analisis structure & zone.", 
+        ai_greet: "<strong>Analyst Mode</strong><br>Halo Trader, berikan nama aset untuk analisis structure & zone.", 
         e_title: "✨ AI Photo Enhancer", e_btn: "Proses HD", 
         q1: "📊 Analisa BTC", q1q: "Analisa Market Structure BTC", 
         q2: "🎯 Sinyal SOL", q2q: "Rekomendasi posisi SOL", 
@@ -140,7 +141,7 @@ const trans = {
     en: { 
         h_desc: "First meme coin on paxi ecosystem L1 with AI utility", 
         h_tg: "Join Telegram", 
-        ai_greet: "<strong>CATOVISION AI Analyst</strong><br>Hello Trader, provide an asset name for structure analysis.", 
+        ai_greet: "<strong>Analyst Mode</strong><br>Hello Trader, provide an asset name for structure analysis.", 
         e_title: "✨ AI Photo Enhancer", e_btn: "Process HD", 
         q1: "📊 BTC Analysis", q1q: "Analyze BTC Market Structure", 
         q2: "🎯 SOL Signal", q2q: "SOL position recommendation", 
@@ -151,13 +152,13 @@ const trans = {
     zh: { 
         h_desc: "Paxi 生态 L1 上首个具备 AI 实用工具的模因币", 
         h_tg: "加入 Telegram", 
-        ai_greet: "<strong>CATOVISION 分析师 AI</strong><br>交易者您好，请输入资产名称进行结构分析。", 
+        ai_greet: "<strong>分析师模式</strong><br>交易者您好，请输入资产名称进行结构分析。", 
         e_title: "✨ AI 照片增强器", e_btn: "处理高清", 
         q1: "📊 BTC 分析", q1q: "分析 BTC 市场结构", 
         q2: "🎯 SOL 信号", q2q: "SOL 持仓建议", 
         q3: "💎 ETH 层级", q3q: "ETH 支撑和需求区",
         loading: "CATO 正在分析中...",
-        error: "数据加载 kegal。"
+        error: "数据加载错误。"
     }
 };
 
@@ -166,8 +167,13 @@ let curLang = 'id';
 function setLang(l) {
     curLang = l;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    if(event) event.target.classList.add('active');
     
+    // Perbaikan: Hanya aktifkan jika dipicu oleh klik manual
+    if(window.event && window.event.target) {
+        window.event.target.classList.add('active');
+    }
+
+    // Update teks elemen satu per satu
     document.getElementById('h-desc').innerText = trans[l].h_desc;
     document.getElementById('h-tg').innerText = trans[l].h_tg;
     document.getElementById('ai-greet').innerHTML = trans[l].ai_greet;
@@ -179,6 +185,15 @@ function setLang(l) {
     const b3 = document.getElementById('q3'); b3.innerText = trans[l].q3; b3.setAttribute('data-q', trans[l].q3q);
 }
 
+// Fungsi Tab Navigation
+function showTab(e, id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(e) e.currentTarget.classList.add('active');
+}
+
+// Efek Mengetik
 function typeEffect(element, text, speed = 15) {
     let i = 0;
     element.innerHTML = "";
@@ -204,7 +219,6 @@ async function askAI() {
     input.value = '';
     
     const loadingId = "load-" + Date.now();
-    // Menggunakan bahasa sesuai pilihan user untuk teks loading
     box.innerHTML += `<div class="ai-bubble" id="${loadingId}">${trans[curLang].loading}</div>`;
     box.scrollTop = box.scrollHeight;
 
@@ -224,22 +238,17 @@ async function askAI() {
     }
 }
 
-function showTab(e, id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    e.currentTarget.classList.add('active');
-}
-
 function quickQuery(q) { 
     document.getElementById('userQuery').value = q; 
     askAI(); 
 }
 
+// Inisialisasi awal
 setLang('id');
 </script>
 </body>
 </html>
+
 
 
 
