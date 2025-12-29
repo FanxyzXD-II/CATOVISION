@@ -11,7 +11,7 @@ app = Flask(__name__,
 
 # Konfigurasi API Key
 # Disarankan mengisi via Environment Variables di Dashboard Vercel dengan nama 'GROQ_API_KEY'
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "MASUKKAN_KEY_GROQ_ANDA_DI_SINI")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
 
 @app.route("/")
 def index():
@@ -97,4 +97,5 @@ def chat():
 
 # Diperlukan oleh Vercel Serverless
 app = app
+
 
