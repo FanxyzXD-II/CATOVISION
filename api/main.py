@@ -39,13 +39,14 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst - Fokus 100% pada Analisa Crypto & Candlestick"""
+    """Fitur AI Analyst - Fokus 100% Crypto & Wajib Menggunakan Harga Live"""
     user_query = request.form.get('query')
     lang = request.form.get('lang', 'id')
     
     if not GROQ_API_KEY:
         return jsonify({"reply": "API Key Groq tidak ditemukan."})
 
+    # 1. Ambil Data Harga Real-time (Market Context)
     market_context = ""
     try:
         search_res = requests.get(f"https://api.coingecko.com/api/v3/search?query={user_query}", timeout=3).json()
@@ -54,31 +55,33 @@ def chat():
             p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true", timeout=3).json()
             if coin_id in p_res:
                 data = p_res[coin_id]
-                market_context = f"[Harga {coin_id.upper()}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)]"
+                # Label kapital agar AI memberikan perhatian penuh pada data ini
+                market_context = f"DATA HARGA SAAT INI UNTUK {coin_id.upper()}: ${data['usd']} USD (Perubahan 24j: {round(data.get('usd_24h_change', 0), 2)}%)."
     except Exception:
-        market_context = ""
+        market_context = "Data harga live saat ini sedang tidak tersedia."
 
     try:
         headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
         
-        # PROMPT BARU: Memaksa AI fokus pada Crypto, Candlestick, Trend, dan Buy/Sell
+        # SYSTEM PROMPT YANG DIPERKETAT
         system_prompt = (
-            f"You are CATOVISION AI, a professional Cryptocurrency technical analyst. "
-            f"Respond 100% in {lang}. Your expertise is strictly limited to: "
-            f"1. Candlestick pattern analysis. "
-            f"2. Market trend analysis (Bullish/Bearish/Side-ways). "
-            f"3. Providing trading signals (Buy/Sell) with Entry, TP, and SL based on Market Structure (BOS, CHoCH). "
-            f"4. Identifying Support and Demand zones. "
-            f"Crucial: If the query is 'SOL', it means Solana Cryptocurrency. Never discuss Linux or non-crypto topics."
+            f"You are CATOVISION AI, a world-class professional Cryptocurrency technical analyst. "
+            f"Mandatory: Respond 100% in {lang}. "
+            f"Instructions: "
+            f"1. You MUST use the 'DATA HARGA SAAT INI' provided in the context for your analysis. "
+            f"2. Focus 100% on Candlestick patterns, market trends, and crypto structure. "
+            f"3. Provide trading signals (Buy/Sell) with specific Entry (near current price), TP, and SL. "
+            f"4. Always analyze based on real-time data provided. Never use old or hallucinated prices. "
+            f"5. 'SOL' always means Solana Cryptocurrency, never Linux or other topics."
         )
 
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "llama-3.3-70b-versatile", # Model terbaru
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Context: {market_context}\nQuery: {user_query}"}
+                {"role": "user", "content": f"MARKET CONTEXT: {market_context}\n\nQUERY: {user_query}"}
             ],
-            "temperature": 0.5 # Temperature rendah agar analisa lebih akurat dan tidak melantur
+            "temperature": 0.4 # Diturunkan agar AI lebih patuh pada data angka
         }
         
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=15)
@@ -87,7 +90,6 @@ def chat():
         if response.status_code == 200 and 'choices' in res_json:
             return jsonify({"reply": res_json['choices'][0]['message']['content']})
         
-        # Pesan error spesifik jika API bermasalah
         error_msg = res_json.get('error', {}).get('message', 'AI sedang sibuk.')
         return jsonify({"reply": f"CATOVISION Error: {error_msg}"})
 
