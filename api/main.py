@@ -19,7 +19,6 @@ def index():
     koleksi_kucing = [
         {"id": 1, "name": "Green Cat", "img": "1000037411.jpg"},
         {"id": 2, "name": "Turquoise Cat", "img": "1000037421.jpg"},
-        {"id": 3, "name": "Caton Profile", "img": "100003748.jpg"}
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
@@ -98,3 +97,4 @@ def chat():
 
 # Diperlukan oleh Vercel Serverless
 app = app
+
