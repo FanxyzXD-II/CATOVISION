@@ -154,31 +154,31 @@
 
 <script>
 // --- REAL-TIME BLOCKCHAIN DATA CONFIG ---
-const PAXI_SCAN_API = "https://winscan.winsnip.xyz/paxi-mainnet"; // Ganti dengan URL API resmi Paxi
-const TOKEN_DENOM = "CATON"; // Nama denom token Anda di chain
+// Menggunakan REST API yang sesuai dengan node paxinet.io
+const PAXI_REST_API = "https://mainnet-api.paxinet.io"; 
+const TOKEN_DENOM = "caton"; // Sesuaikan denom (biasanya huruf kecil)
 
 async function updateBlockchainData() {
     try {
-        // Fetch Supply & Holders (Endpoint ini disesuaikan dengan standar Cosmos/Paxi API)
-        const response = await fetch(`${PAXI_SCAN_API}/v1/token/stats/${TOKEN_DENOM}`);
+        // Mengambil Total Supply dari modul bank Cosmos SDK
+        const response = await fetch(`${PAXI_REST_API}/cosmos/bank/v1beta1/supply/by_denom?denom=${TOKEN_DENOM}`);
         const data = await response.json();
 
-        if (data) {
-            // Update UI dengan animasi perlahan jika data tersedia
-            document.getElementById('val-supply').innerText = (data.total_supply || "1,000,000,000").toLocaleString();
-            document.getElementById('val-holders').innerText = (data.holders_count || "1,452") + "+";
+        if (data && data.amount) {
+            // Asumsi 6 desimal (bagi 1.000.000), sesuaikan jika token Anda berbeda
+            const supply = parseFloat(data.amount.amount) / 1000000;
+            document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
         }
     } catch (error) {
         console.log("Blockchain data fetch error, using fallback.");
-        // Fallback default jika API tidak merespons
         document.getElementById('val-supply').innerText = "1,000,000,000";
-        document.getElementById('val-holders').innerText = "1,452+";
     }
 }
-// Jalankan fetching saat load
+
+// Jalankan saat load
 updateBlockchainData();
-// Refresh data setiap 30 detik
-setInterval(updateBlockchainData, 30000);
+// Refresh data setiap 60 detik agar tidak membebani RPC
+setInterval(updateBlockchainData, 60000);
 
 const i18n = {
     id: {
@@ -299,6 +299,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
