@@ -24,13 +24,14 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur AI Photo Enhancer (Asli - Tetap Kualitas Tinggi)"""
+    """Fitur AI Photo Enhancer (Kualitas Tinggi Tetap Dipertahankan)"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
+        # Peningkatan Ketajaman dan Kontras
         img = ImageEnhance.Sharpness(img).enhance(2.5)
         img = ImageEnhance.Contrast(img).enhance(1.4)
         
@@ -43,7 +44,7 @@ def enhance_photo():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """Fitur AI Analyst dengan Kompresi Otomatis untuk Kecepatan"""
+    """Fitur AI Analyst Profesional menggunakan Llama 4"""
     user_query = request.form.get('query', '')
     lang = request.form.get('lang', 'id')
     image_file = request.files.get('image')
@@ -51,7 +52,10 @@ def chat():
     if not GROQ_API_KEY:
         return jsonify({"reply": "API Key Groq tidak ditemukan."})
 
-    # --- Market Context ---
+    # --- KONFIGURASI MODEL TUNGGAL LLAMA 4 ---
+    SELECTED_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+
+    # --- Market Context (CoinGecko) ---
     market_context = ""
     if user_query and not image_file:
         try:
@@ -61,64 +65,72 @@ def chat():
                 p_res = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_change=true", timeout=3).json()
                 if coin_id in p_res:
                     data = p_res[coin_id]
-                    market_context = f"[Harga {coin_id}: ${data['usd']} ({round(data.get('usd_24h_change', 0), 2)}%)]"
+                    market_context = f"[Live Market Data: {coin_id.upper()} Price: ${data['usd']} | 24h Change: {round(data.get('usd_24h_change', 0), 2)}%]"
         except:
             pass
 
-    # --- Penanganan Input (Vision vs Text) ---
+    # --- Penanganan Konten Multimodal ---
+    content_list = []
+    
+    # Gabungkan teks input dengan data pasar
+    full_text_input = f"{market_context}\nUser Question: {user_query if user_query else 'Provide a professional analysis of the provided data/image.'}"
+    content_list.append({"type": "text", "text": full_text_input})
+
+    # Proses Gambar jika dilampirkan
     if image_file:
-        selected_model = "llama-3.2-11b-vision-preview"
         try:
-            # PROSES KOMPRESI: Agar tidak timeout di Vercel
             img = Image.open(image_file).convert("RGB")
-            
-            # Batasi ukuran maksimal 1024px (tetap tajam untuk AI)
+            # Resize untuk efisiensi API namun tetap tajam
             img.thumbnail((1024, 1024)) 
             
             buffered = io.BytesIO()
-            # Simpan dengan kualitas 75% untuk mengecilkan ukuran file secara drastis
-            img.save(buffered, format="JPEG", quality=75) 
+            img.save(buffered, format="JPEG", quality=80) 
             image_data = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-            content = [
-                {"type": "text", "text": f"Instruction: {user_query if user_query else 'Analyze this chart'}"},
-                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}}
-            ]
+            content_list.append({
+                "type": "image_url", 
+                "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
+            })
         except Exception as e:
             return jsonify({"reply": f"Gagal memproses gambar: {str(e)}"})
-    else:
-        selected_model = "llama-3.3-70b-versatile"
-        content = f"Context: {market_context}\nQuery: {user_query}"
+
+    # --- SYSTEM PROMPT ANALIS PROFESIONAL ---
+    system_instruction = (
+        f"You are CATOVISION AI, a Senior Financial Analyst powered by Llama 4. "
+        f"Your response must be in {lang}. "
+        "\n\nSTRICT FORMATTING RULES:"
+        "\n1. EXECUTIVE SUMMARY: Briefly state the main insight."
+        "\n2. DATA TABLE: Use a Markdown table to summarize key metrics, price levels, or observations."
+        "\n3. DETAILED ANALYSIS: Provide professional reasoning using financial terminology."
+        "\n4. RISK ASSESSMENT: Mention potential downsides or volatility risks."
+        "\n5. If a chart is provided, identify trends, support/resistance, and technical indicators."
+    )
 
     try:
         payload = {
-            "model": selected_model,
+            "model": SELECTED_MODEL,
             "messages": [
-                {
-                    "role": "system", 
-                    "content": f"You are CATOVISION AI, financial expert. Answer in {lang}."
-                },
-                {"role": "user", "content": content}
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": content_list}
             ],
-            "temperature": 0.5
+            "temperature": 0.4, # Rendah agar lebih presisi dan tidak berhalusinasi
+            "max_tokens": 2048
         }
         
-        # Kirim ke Groq dengan timeout ketat
         response = requests.post(
             "https://api.groq.com/openai/v1/chat/completions", 
             headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}, 
             json=payload, 
-            timeout=8.5 
+            timeout=15 
         )
         
         if response.status_code == 200:
             return jsonify({"reply": response.json()['choices'][0]['message']['content']})
         
-        return jsonify({"reply": "AI Sedang sibuk atau limit tercapai. Coba beberapa saat lagi."})
+        return jsonify({"reply": f"Groq Error ({response.status_code}): Model Llama 4 tidak merespon."})
     
     except Exception as e:
-        return jsonify({"reply": "Koneksi terputus atau timeout (gambar terlalu besar)."})
+        return jsonify({"reply": "Koneksi timeout. Pastikan file tidak terlalu besar dan API Key benar."})
 
 # Export app
 app = app
-
