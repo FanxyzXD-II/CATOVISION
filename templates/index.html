@@ -156,21 +156,41 @@
 
 <script>
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
-const TOKEN_NAMA = "caton"; 
+const CONTRACT_ADDR = "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9";
 
 async function updateBlockchainData() {
     try {
-        const response = await fetch(`${PAXI_REST_API}/assets/paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9/by_nama?nama=${TOKEN_NAMA}`);
+        // 1. Ambil Data Total Supply & Detail Asset
+        const response = await fetch(`${PAXI_REST_API}/assets/${CONTRACT_ADDR}`);
         const data = await response.json();
-        if (data && data.amount) {
-            const supply = parseFloat(data.amount.amount) / 1000000;
-            document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
+
+        if (data) {
+            // Update Total Supply (Jika ingin otomatis dari blockchain)
+            // Jika ingin tetap manual 1M, bagian ini bisa dihapus
+            if (data.supply) {
+                const supply = parseFloat(data.supply) / 1000000;
+                document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
+            }
+
+            // 2. Update Jumlah Pemegang (Holders)
+            // Mengambil field 'holders' atau 'holders_count' dari API Winscan
+            if (data.holders_count || data.holders) {
+                const holders = data.holders_count || data.holders;
+                document.getElementById('val-holders').innerText = holders.toLocaleString('id-ID');
+            }
         }
     } catch (error) {
+        console.error("Gagal mengambil data blockchain:", error);
+        // Fallback jika API error
         document.getElementById('val-supply').innerText = "1,000,000,000";
+        document.getElementById('val-holders').innerText = "36"; 
     }
 }
+
+// Jalankan saat halaman dibuka
 updateBlockchainData();
+
+// Perbarui setiap 1 menit (60000 ms)
 setInterval(updateBlockchainData, 60000);
 const i18n = {
     id: {
@@ -305,6 +325,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
