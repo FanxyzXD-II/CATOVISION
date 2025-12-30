@@ -156,23 +156,52 @@
 
 <script>
 const PAXI_REST_API = "https://mainnet-api.paxinet.io"; 
-const TOKEN_DENOM = "caton"; 
+const TOKEN_DENOM = "CATON"; 
 
 async function updateBlockchainData() {
+    // 1. Update TOTAL SUPPLY
     try {
-        const response = await fetch(`${PAXI_REST_API}/cosmos/bank/v1beta1/supply/by_denom?denom=${TOKEN_DENOM}`);
-        const data = await response.json();
-        if (data && data.amount) {
-            const supply = parseFloat(data.amount.amount) / 1000000;
+        const resSupply = await fetch(`${PAXI_REST_API}/cosmos/bank/v1beta1/supply/by_denom?denom=${TOKEN_DENOM}`);
+        const dataSupply = await resSupply.json();
+        
+        if (dataSupply && dataSupply.amount) {
+            const supply = parseFloat(dataSupply.amount.amount) / 1000000;
             document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
+        } else {
+            document.getElementById('val-supply').innerText = "Loading...";
         }
     } catch (error) {
-        document.getElementById('val-supply').innerText = "1,000,000,000";
+        document.getElementById('val-supply').innerText = "Loading...";
+    }
+
+    // 2. Update HOLDERS
+    try {
+        // Menggunakan endpoint balances untuk mendapatkan total akun
+        const resHolders = await fetch(`${PAXI_REST_API}/cosmos/bank/v1beta1/balances`);
+        const dataHolders = await resHolders.json();
+        
+        // Memeriksa total dari pagination (standar Cosmos SDK)
+        if (dataHolders && dataHolders.pagination && dataHolders.pagination.total) {
+            const totalHolders = dataHolders.pagination.total;
+            document.getElementById('val-holders').innerText = parseInt(totalHolders).toLocaleString('id-ID');
+        } 
+        // Alternatif jika pagination total tidak tersedia namun ada array balances
+        else if (dataHolders && dataHolders.balances) {
+            document.getElementById('val-holders').innerText = dataHolders.balances.length.toLocaleString('id-ID');
+        }
+        else {
+            document.getElementById('val-holders').innerText = "Loading...";
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
+        document.getElementById('val-holders').innerText = "Loading...";
     }
 }
-updateBlockchainData();
-setInterval(updateBlockchainData, 60000);
 
+// Inisialisasi awal
+updateBlockchainData();
+// Interval 1 menit
+setInterval(updateBlockchainData, 60000);
 const i18n = {
     id: {
         h_desc: "Meme coin pertama di Paxi L1 dengan utilitas AI",
@@ -306,5 +335,6 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
