@@ -34,15 +34,13 @@
     .logo-caton { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--accent); padding: 5px; background: var(--bg); margin-bottom: 15px; object-fit: cover; }
     .ca-box { background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 15px; font-family: monospace; font-size: 11px; border: 1px dashed var(--accent); color: var(--accent); word-break: break-all; cursor: pointer; margin: 15px 0; }
 
-    /* BUTTONS */
-    .btn-tg { background: var(--tg-color); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 18px; font-weight: bold; margin-top: 15px; transition: 0.3s; border: none; width: 100%; cursor: pointer; }
-    .btn-tg:hover { filter: brightness(1.1); }
-
     /* STATS HOME */
     .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
     .stat-card { background: rgba(30, 41, 59, 0.5); padding: 15px; border-radius: 18px; border: 1px solid var(--border); }
     .stat-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
     .stat-val { display: block; font-size: 15px; font-weight: bold; color: var(--accent); margin-top: 5px; }
+
+    .btn-tg { background: var(--tg-color); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 18px; font-weight: bold; margin-top: 15px; transition: 0.3s; border: none; width: 100%; cursor: pointer; }
 
     /* CHAT INTERFACE */
     .chat-container { display: flex; flex-direction: column; height: 75vh; background: #070a13; border-radius: 30px; border: 1px solid var(--border); overflow: hidden; }
@@ -117,7 +115,9 @@
             </div>
             {% endfor %}
         </div>
-    </div> <div id="ai" class="section">
+    </div> 
+
+    <div id="ai" class="section">
         <div class="chat-container">
             <div id="chatMessages" class="chat-messages">
                 <div class="ai-bubble" id="ai-greet">Welcome Trader! Provide asset name for CATOVISION AI analysis.</div>
@@ -154,9 +154,7 @@
     </div>
 </div>
 
-
 <script>
-// --- REAL-TIME BLOCKCHAIN DATA CONFIG ---
 const PAXI_REST_API = "https://mainnet-api.paxinet.io"; 
 const TOKEN_DENOM = "caton"; 
 
@@ -172,7 +170,6 @@ async function updateBlockchainData() {
         document.getElementById('val-supply').innerText = "1,000,000,000";
     }
 }
-
 updateBlockchainData();
 setInterval(updateBlockchainData, 60000);
 
@@ -258,19 +255,13 @@ function previewImg(input) {
 }
 function clearPreview() { document.getElementById('previewWrap').style.display = 'none'; document.getElementById('aiFile').value = ''; }
 
-// --- FITUR BARU: TYPEWRITER EFFECT ---
 function typeWriter(element, text, speed = 15) {
     let i = 0;
     element.innerHTML = ""; 
     element.classList.add("typing");
-    
     function type() {
         if (i < text.length) {
-            if (text.charAt(i) === '\n') {
-                element.innerHTML += '<br>';
-            } else {
-                element.innerHTML += text.charAt(i);
-            }
+            element.innerHTML += (text.charAt(i) === '\n') ? '<br>' : text.charAt(i);
             i++;
             setTimeout(type, speed);
             const box = document.getElementById('chatMessages');
@@ -289,16 +280,9 @@ async function askAI() {
     const val = input.value.trim();
     if(!val && !file) return;
 
-    // Tampilkan bubble user
-    let html = `<div class="user-bubble">`;
-    if(file) html += `<img src="${document.getElementById('imgPreview').src}" style="max-width:100%; border-radius:12px; margin-bottom:8px; display:block;">`;
-    html += `${val}</div>`;
-    
-    box.innerHTML += html;
-    input.value = ''; 
-    clearPreview();
+    box.innerHTML += `<div class="user-bubble">${file ? `<img src="${document.getElementById('imgPreview').src}" style="max-width:100%; border-radius:12px; margin-bottom:8px; display:block;">` : ''}${val}</div>`;
+    input.value = ''; clearPreview();
 
-    // Tampilkan loading bubble
     const loadId = "L" + Date.now();
     box.innerHTML += `<div class="ai-bubble" id="${loadId}">${i18n[curLang].loading}</div>`;
     box.scrollTop = box.scrollHeight;
@@ -311,11 +295,7 @@ async function askAI() {
     try {
         const res = await fetch('/chat', { method: 'POST', body: fd });
         const data = await res.json();
-        
-        // Jalankan efek mengetik
-        const aiBubble = document.getElementById(loadId);
-        typeWriter(aiBubble, data.reply, 15);
-        
+        typeWriter(document.getElementById(loadId), data.reply, 15);
     } catch { 
         document.getElementById(loadId).innerText = "Connection Error."; 
     }
@@ -326,205 +306,4 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            {% for cat in cats %}
-            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 10px; text-align: center;">
-                <img src="/static/uploads/{{ cat.img }}" style="width: 100%; border-radius: 15px; height: 150px; object-fit: cover;">
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div id="ai" class="section">
-        <div class="chat-container">
-            <div id="chatMessages" class="chat-messages">
-                <div class="ai-bubble" id="ai-greet">Welcome Trader! Provide asset name for CATOVISION AI analysis.</div>
-            </div>
-            
-            <div class="input-area">
-                <div id="previewWrap" class="preview-container">
-                    <span class="close-preview" onclick="clearPreview()">×</span>
-                    <img id="imgPreview">
-                </div>
-                
-                <div id="quickActions" style="display:flex; gap:8px; margin-bottom:12px; overflow-x:auto;"></div>
-                
-                <div class="input-row">
-                    <label style="cursor:pointer; font-size:20px;">
-                        <input type="file" id="aiFile" hidden onchange="previewImg(this)">📁
-                    </label>
-                    <input id="userQuery" type="text" placeholder="Type here...">
-                    <button class="send-btn" onclick="askAI()" id="btn-send-text">Send</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="clear" class="section">
-        <div class="card">
-            <h2 id="e-title">AI Photo Enhancer</h2>
-            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Turn blurry photos into HD instantly.</p>
-            <form action="/enhance" method="post" enctype="multipart/form-data">
-                <input type="file" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-                <button type="submit" class="send-btn" style="width:100%; padding:15px;">Process to HD</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-// --- REAL-TIME BLOCKCHAIN DATA CONFIG ---
-// Menggunakan REST API yang sesuai dengan node paxinet.io
-const PAXI_REST_API = "https://mainnet-api.paxinet.io"; 
-const TOKEN_DENOM = "caton"; // Sesuaikan denom (biasanya huruf kecil)
-
-async function updateBlockchainData() {
-    try {
-        // Mengambil Total Supply dari modul bank Cosmos SDK
-        const response = await fetch(`${PAXI_REST_API}/cosmos/bank/v1beta1/supply/by_denom?denom=${TOKEN_DENOM}`);
-        const data = await response.json();
-
-        if (data && data.amount) {
-            // Asumsi 6 desimal (bagi 1.000.000), sesuaikan jika token Anda berbeda
-            const supply = parseFloat(data.amount.amount) / 1000000;
-            document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
-        }
-    } catch (error) {
-        console.log("Blockchain data fetch error, using fallback.");
-        document.getElementById('val-supply').innerText = "1,000,000,000";
-    }
-}
-
-// Jalankan saat load
-updateBlockchainData();
-// Refresh data setiap 60 detik agar tidak membebani RPC
-setInterval(updateBlockchainData, 60000);
-
-const i18n = {
-    id: {
-        h_desc: "Meme coin pertama di Paxi L1 dengan utilitas AI",
-        h_btn: "Gabung Grup Telegram",
-        l_supply: "Total Pasokan", l_holders: "Pemegang",
-        ai_greet: "Halo Trader! Masukkan nama aset atau upload chart untuk CATOVISION AI analisa.",
-        e_title: "✨ Peningkat Foto AI",
-        send: "Kirim", loading: "CATOVISION AI Menganalisis...",
-        q1: "📊Analisa BTC", q2: "🎯 Sinyal SOL",
-        m_home: "Beranda", m_ai: "Analisis AI", m_clear: "Foto HD"
-    },
-    en: {
-        h_desc: "First meme coin on Paxi L1 with AI utility",
-        h_btn: "Join Telegram Group",
-        l_supply: "Total Supply", l_holders: "Holders",
-        ai_greet: "Hello Trader! Provide asset name or upload a chart for CATOVISION AI analysis.",
-        e_title: "✨ AI Photo Enhancer",
-        send: "Send", loading: "CATOVISION AI Analyzing...",
-        q1: "📊 BTC Analysis", q2: "🎯 SOL Signal",
-        m_home: "Home", m_ai: "AI Analyst", m_clear: "AI Enhancer"
-    },
-    zh: {
-        h_desc: "Paxi L1 上首个具备 AI 实用工具的模因币",
-        h_btn: "加入 Telegram 群组",
-        l_supply: "总供应量", l_holders: "持有者",
-        ai_greet: "交易者您好，请输入资产名称或上传图表以供 CATOVISION AI 分析.。",
-        e_title: "✨ AI 照片增强",
-        send: "发送", loading: "CATOVISION AI 分析",
-        q1: "📊 BTC 分析", q2: "🎯 SOL 信号",
-        m_home: "首页", m_ai: "AI 分析", m_clear: "照片增强"
-    }
-};
-
-let curLang = 'id';
-
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-function navTo(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-    document.getElementById('m-'+id).classList.add('active');
-    if(window.innerWidth < 1000) toggleSidebar();
-}
-
-function copyCA() {
-    navigator.clipboard.writeText("paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9");
-    alert("CA Copied!");
-}
-
-function changeLang(l, btn) {
-    curLang = l;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    document.getElementById('h-desc').innerText = i18n[l].h_desc;
-    document.getElementById('h-btn').innerText = i18n[l].h_btn;
-    document.getElementById('l-supply').innerText = i18n[l].l_supply;
-    document.getElementById('l-holders').innerText = i18n[l].l_holders;
-    document.getElementById('ai-greet').innerText = i18n[l].ai_greet;
-    document.getElementById('e-title').innerText = i18n[l].e_title;
-    document.getElementById('btn-send-text').innerText = i18n[l].send;
-    document.getElementById('m-home').innerText = i18n[l].m_home;
-    document.getElementById('m-ai').innerText = i18n[l].m_ai;
-    document.getElementById('m-clear').innerText = i18n[l].m_clear;
-
-    document.getElementById('quickActions').innerHTML = `
-        <button onclick="setQuery('${i18n[l].q1}')" style="background:rgba(56,189,248,0.1); border:1px solid var(--accent); color:var(--accent); padding:8px 15px; border-radius:12px; font-size:11px; cursor:pointer;">${i18n[l].q1}</button>
-        <button onclick="setQuery('${i18n[l].q2}')" style="background:rgba(56,189,248,0.1); border:1px solid var(--accent); color:var(--accent); padding:8px 15px; border-radius:12px; font-size:11px; cursor:pointer;">${i18n[l].q2}</button>
-    `;
-}
-
-function previewImg(input) {
-    const wrap = document.getElementById('previewWrap');
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => { 
-            document.getElementById('imgPreview').src = e.target.result; 
-            wrap.style.display = 'block'; 
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-function clearPreview() { document.getElementById('previewWrap').style.display = 'none'; document.getElementById('aiFile').value = ''; }
-
-async function askAI() {
-    const input = document.getElementById('userQuery');
-    const file = document.getElementById('aiFile').files[0];
-    const box = document.getElementById('chatMessages');
-    const val = input.value.trim();
-    if(!val && !file) return;
-
-    let html = `<div class="user-bubble">`;
-    if(file) html += `<img src="${document.getElementById('imgPreview').src}" style="max-width:100%; border-radius:12px; margin-bottom:8px; display:block;">`;
-    html += `${val}</div>`;
-    
-    box.innerHTML += html;
-    input.value = ''; clearPreview();
-    const loadId = "L" + Date.now();
-    box.innerHTML += `<div class="ai-bubble" id="${loadId}">${i18n[curLang].loading}</div>`;
-    box.scrollTop = box.scrollHeight;
-
-    const fd = new FormData();
-    fd.append('query', val);
-    fd.append('lang', curLang);
-    if(file) fd.append('image', file);
-
-    try {
-        const res = await fetch('/chat', { method: 'POST', body: fd });
-        const data = await res.json();
-        document.getElementById(loadId).innerText = data.reply;
-        box.scrollTop = box.scrollHeight;
-    } catch { document.getElementById(loadId).innerText = "Connection Error."; }
-}
-
-function setQuery(v) { document.getElementById('userQuery').value = v; askAI(); }
-changeLang('id', document.querySelector('.lang-btn'));
-</script>
-</body>
-</html>
-
-
-
-
-
-
 
