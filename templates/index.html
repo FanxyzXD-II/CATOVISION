@@ -155,50 +155,23 @@
 </div>
 
 <script>
-// Konfigurasi Token
-const TOKEN_CONFIG = {
-    symbol: "CATON",
-    fixedSupply: "1,000,000,000",
-    contractAddress: "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9",
-    initialHolders: 36 // Angka awal saat ini
-};
+const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
+const TOKEN_NAMA = "caton"; 
 
-// Fungsi untuk memperbarui tampilan di HTML
-function updateUI(holders) {
-    const supplyElement = document.getElementById("total-pasokan");
-    const holdersElement = document.getElementById("total-holders");
-
-    if(supplyElement) supplyElement.innerText = TOKEN_CONFIG.fixedSupply;
-    if(holdersElement) holdersElement.innerText = holders;
-}
-
-// Fungsi utama mengambil data dari Blockchain Explorer
-async function fetchBlockchainData() {
+async function updateBlockchainData() {
     try {
-        // Catatan: Ganti URL ini jika Winscan menyediakan endpoint API resmi (misal: api.winscan.xyz)
-        const response = await fetch(`https://winscan.winsnip.xyz/paxi-mainnet/assets/${TOKEN_CONFIG.contractAddress}`);
-        
-        if (!response.ok) throw new Error('Network response was not ok');
-        
+        const response = await fetch(`${PAXI_REST_API}/assets/paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9/by_nama?nama=${TOKEN_NAMA}`);
         const data = await response.json();
-        
-        // Misal struktur JSON dari Winscan adalah data.holders
-        if (data && data.holders) {
-            updateUI(data.holders);
+        if (data && data.amount) {
+            const supply = parseFloat(data.amount.amount) / 1000000;
+            document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
         }
     } catch (error) {
-        console.warn("CATOVISION: Menjalankan mode fallback (Data tetap aman).");
-        
-        // FALLBACK: Jika API gagal, tetap tampilkan angka awal agar web tidak kosong
-        updateUI(TOKEN_CONFIG.initialHolders);
+        document.getElementById('val-supply').innerText = "1,000,000,000";
     }
 }
-
-// Jalankan saat halaman dimuat
-document.addEventListener('DOMContentLoaded', () => {
-    fetchBlockchainData();
-    // Refresh setiap 30 detik agar tidak membebani server
-    setInterval(fetchBlockchainData, 30000); 
+updateBlockchainData();
+setInterval(updateBlockchainData, 60000);
 const i18n = {
     id: {
         h_desc: "Meme coin pertama di Paxi L1 dengan utilitas AI",
@@ -332,6 +305,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
