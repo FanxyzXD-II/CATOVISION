@@ -158,20 +158,6 @@
 let baseSupply = 1000000000; 
 let baseHolders = 36; //
 async function updateBlockchainData() {
-    // 1. Logika Randomized Growth (Simulasi Pertumbuhan)
-    // Angka supply tetap atau bertambah sangat sedikit
-    const supplyGrowth = Math.random() * 0.1;
-    baseSupply += supplyGrowth;
-    
-    // Holders bertambah 1 setiap kali probabilitas 20% terpenuhi
-    if (Math.random() > 0.8) {
-        baseHolders += 1;
-    }
-
-    // Tampilkan ke layar
-    document.getElementById('val-supply').innerText = Math.floor(baseSupply).toLocaleString('id-ID');
-    document.getElementById('val-holders').innerText = baseHolders.toLocaleString('id-ID');
-
     // 2. Fetch Data dari Winscan (Jika API tersedia)
     // Karena ini PRC20, biasanya data diambil melalui indexer explorer
     try {
@@ -323,6 +309,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
