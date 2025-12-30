@@ -96,7 +96,7 @@ def chat():
 
     # --- SYSTEM PROMPT ANALIS PROFESIONAL ---
     system_instruction = (
-        f"You are CATOVISION AI, a Senior Financial Analyst powered by Llama 4. "
+        f"You are CATOVISION AI, a Senior Financial Analyst. "
         f"Your response must be in {lang}. "
         "\n\nSTRICT FORMATTING RULES:"
         "\n1. EXECUTIVE SUMMARY: Briefly state the main insight."
@@ -134,3 +134,4 @@ def chat():
 
 # Export app
 app = app
+
