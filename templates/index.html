@@ -117,9 +117,7 @@
             </div>
             {% endfor %}
         </div>
-    </div>
-
-    <div id="ai" class="section">
+    </div> <div id="ai" class="section">
         <div class="chat-container">
             <div id="chatMessages" class="chat-messages">
                 <div class="ai-bubble" id="ai-greet">Welcome Trader! Provide asset name for CATOVISION AI analysis.</div>
@@ -147,7 +145,7 @@
     <div id="clear" class="section">
         <div class="card">
             <h2 id="e-title">AI Photo Enhancer</h2>
-            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Ubah foto buram menjadi HD secara instan.</p>
+            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Convert blurry photos to HD.</p>
             <form action="/enhance" method="post" enctype="multipart/form-data">
                 <input type="file" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
                 <button type="submit" class="send-btn" style="width:100%; padding:15px;">Process to HD</button>
@@ -155,6 +153,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
 // --- REAL-TIME BLOCKCHAIN DATA CONFIG ---
@@ -522,6 +521,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
