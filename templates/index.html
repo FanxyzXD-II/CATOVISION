@@ -161,7 +161,7 @@ async function updateBlockchainData() {
     // 2. Fetch Data dari Winscan (Jika API tersedia)
     // Karena ini PRC20, biasanya data diambil melalui indexer explorer
     try {
-        const response = await fetch('https://winscan.winsnip.xyz/api/v1/assets/caton'); // Sesuaikan endpoint API Winscan
+        const response = await fetch('https://winscan.winsnip.xyz/paxi-mainnet/assets/paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9'); // Sesuaikan endpoint API Winscan
         const data = await response.json();
         if (data && data.holders_count) {
             baseHolders = data.holders_count;
@@ -309,6 +309,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
