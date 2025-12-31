@@ -4,7 +4,7 @@ import base64
 import requests
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
-from PIL import Image,ImageOps ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
+from PIL import Image, ImageOps, ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
 # Path disesuaikan untuk struktur folder Vercel
 app = Flask(__name__, 
             template_folder='../templates', 
@@ -200,6 +200,7 @@ def remove_watermark():
                 
 # Export app
 app = app
+
 
 
 
