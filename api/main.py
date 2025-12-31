@@ -2,7 +2,6 @@ import os
 import io
 import base64
 import requests
-import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image,ImageOps ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
@@ -201,6 +200,7 @@ def remove_watermark():
                 
 # Export app
 app = app
+
 
 
 
