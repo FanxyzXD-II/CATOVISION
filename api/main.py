@@ -2,6 +2,8 @@ import os
 import io
 import base64
 import requests
+import cv2
+import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image, ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
 
@@ -151,8 +153,59 @@ def chat():
     except Exception as e:
         return jsonify({"reply": "Koneksi timeout. Pastikan file tidak terlalu besar dan API Key benar."})
 
+@app.route("/remove-watermark", methods=["POST"])
+def remove_watermark():
+    if 'photo' not in request.files:
+        return "File tidak ditemukan", 400
+    try:
+        file = request.files['photo']
+        file_bytes = np.frombuffer(file.read(), np.uint8)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        h, w, _ = img.shape
+        
+        # --- TAHAP 1: DETEKSI OTOMATIS BERBASIS AREA ---
+        # Watermark biasanya ada di pojok bawah atau tengah bawah
+        # Kita buat mask kosong
+        mask = np.zeros((h, w), np.uint8)
+        
+        # Konversi ke Grayscale untuk analisis intensitas
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # --- TAHAP 2: DETEKSI LOGO TERANG (Seperti Gemini/AI) ---
+        # Menggunakan Adaptive Thresholding untuk memisahkan teks/logo dari background
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                     cv2.THRESH_BINARY_INV, 11, 2)
+        
+        # Fokuskan deteksi pada area yang sering ditempati watermark (30% area bawah)
+        roi_start_row = int(h * 0.7)
+        mask_roi = thresh[roi_start_row:h, :]
+        
+        # Bersihkan noise kecil (titik-titik halus) agar tidak merusak gambar utama
+        kernel = np.ones((3,3), np.uint8)
+        mask_roi = cv2.morphologyEx(mask_roi, cv2.MORPH_OPEN, kernel)
+        
+        # Gabungkan kembali ke mask utama
+        mask[roi_start_row:h, :] = mask_roi
+
+        # --- TAHAP 3: INPAINTING ---
+        # Menghapus objek berdasarkan mask yang terdeteksi secara otomatis
+        # Radius 5 memberikan hasil yang lebih lembut untuk logo transparan
+        result = cv2.inpaint(img, mask, 5, cv2.INPAINT_TELEA)
+        
+        # Optimasi Akhir: Sedikit penghalusan pada area yang dihapus
+        result = cv2.bilateralFilter(result, 9, 75, 75)
+        
+        _, buffer = cv2.imencode('.jpg', result, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+        img_io = io.BytesIO(buffer)
+        img_io.seek(0)
+        
+        return send_file(img_io, mimetype='image/jpeg')
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+                
 # Export app
 app = app
+
 
 
 
