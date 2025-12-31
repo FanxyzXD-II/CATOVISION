@@ -184,6 +184,36 @@
         </div>
     </div>
 </div>
+  <nav id="sidebar" class="sidebar">
+    <a href="#" id="m-home" class="active" onclick="navTo('home')">Home</a>
+    <a href="#" id="m-ai" onclick="navTo('ai')">AI Analyst</a>
+    <a href="#" id="m-clear" onclick="navTo('clear')">AI Enhancer</a>
+    <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">AI Unwatermark</a>
+  </nav>
+  <div id="unwatermark" class="section">
+    <div class="card">
+        <h2 id="u-title">🚫 AI Watermark Remover</h2>
+        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(56,189,248,0.3);">
+            <p style="font-size: 11px; color: var(--accent); margin: 0;">
+                ✨ <b>Auto-Scan:</b> Mendeteksi otomatis logo Gemini dan teks di area bawah.
+            </p>
+        </div>
+
+        <form id="wmForm">
+            <input type="file" id="wmInput" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
+            <button type="submit" id="wmBtn" class="send-btn" style="width:100%; padding:15px; background: #f43f5e; color: white; border: none;">Process & Erase</button>
+        </form>
+
+        <div id="wmLoading" style="display:none; color:#f43f5e; margin: 15px 0;" class="animate-pulse">Menghapus watermark secara otomatis...</div>
+
+        <div id="wmResultContainer" style="display:none; margin-top:20px;">
+            <img id="imgWmResult" style="width:100%; border-radius:12px; border:1px solid var(--border); margin-bottom: 10px;">
+            <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #10b981; color: white; border: none; padding: 12px; margin-bottom: 8px;">Download Result</button>
+            <button onclick="location.reload()" class="send-btn" style="width:100%; background: #475569; color: white; border: none; padding: 12px;">Reset</button>
+        </div>
+    </div>
+  </div>
+  
 
 <script>
     const form = document.getElementById('enhanceForm');
@@ -266,60 +296,6 @@
         cursor: ew-resize;
     }
 </style>
-
-</div>
-</div>
-</div>
-  <div id="unwatermark" class="section">
-    <div class="card">
-        <h2>AI Watermark Remover</h2>
-        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
-            <p style="font-size: 11px; color: var(--accent); margin: 0;">
-                ✨ <b>Auto Scan Watermark Active:</b> Mendeteksi watermark dan menghapus watermark otomatis.
-            </p>
-        </div>
-        </div>
-  </div>
-<script>):
-i18n.id.m_unwatermark = "Hapus Watermark";
-i18n.en.m_unwatermark = "Unwatermark";
-
-const wmForm = document.getElementById('wmForm');
-wmForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const loading = document.getElementById('wmLoading');
-    const resultCont = document.getElementById('wmResultContainer');
-    loading.style.display = 'block';
-    wmForm.style.display = 'none';
-
-    const fd = new FormData();
-    fd.append('photo', document.getElementById('wmInput').files[0]);
-
-    try {
-        const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
-        if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            document.getElementById('imgWmResult').src = url;
-            loading.style.display = 'none';
-            resultCont.style.display = 'block';
-            
-            document.getElementById('downloadWmBtn').onclick = () => {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = "CLEAN_RESULT.jpg";
-                a.click();
-            };
-        }
-    } catch (err) {
-        alert("Gagal menghapus watermark");
-        loading.style.display = 'none';
-        wmForm.style.display = 'block';
-    }
-};
-  
-  
-
 
 <script>
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
@@ -492,6 +468,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
