@@ -144,27 +144,134 @@
 
 <div id="clear" class="section">
     <div class="card">
-        <h2 id="e-title">AI Photo Enhancer</h2>
-        <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Convert blurry photos to HD.</p>
+        <h2 id="e-title" class="text-xl font-bold mb-2">AI Photo Enhancer</h2>
+        <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Geser garis tengah untuk melihat detail kejernihan.</p>
         
-        <form id="enhanceForm" enctype="multipart/form-data">
+        <form id="enhanceForm">
             <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Process to HD</button>
+            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">PROSES KE HD</button>
         </form>
 
-        <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; height:300px; overflow:hidden; border-radius:10px; border:2px solid #334155;">
-            <img id="imgAfter" style="width:100%; height:100%; object-fit:cover; position:absolute;">
+        <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">⚡ Memproses...</div>
+
+        <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0;">
             
-            <div id="imgBeforeWrapper" style="width:50%; height:100%; position:absolute; top:0; left:0; overflow:hidden; border-right:2px solid #fff; z-index:2;">
-                <img id="imgBefore" style="width:100%; height:100%; object-fit:cover; position:absolute;">
+            <img id="imgAfter" style="width:100%; height:auto; display:block; object-fit: contain;">
+            
+            <div id="imgBeforeWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:2px solid #fff; z-index:2;">
+                <img id="imgBefore" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit: contain; object-position: left center;">
             </div>
 
-            <input type="range" min="0" max="100" value="50" id="slider" style="position:absolute; -webkit-appearance:none; appearance:none; width:100%; height:100%; background:transparent; outline:none; margin:0; cursor:ew-resize; z-index:3;">
+            <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center;">
+                <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid #38bdf8; margin-right:2px;"></div>
+                <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #38bdf8; margin-left:2px;"></div>
+            </div>
+
+            <input type="range" min="0" max="100" value="50" id="slider" style="position:absolute; top:0; left:0; width:100%; height:100%; -webkit-appearance:none; appearance:none; background:transparent; outline:none; margin:0; cursor:ew-resize; z-index:30;">
         </div>
 
-        <div id="loading" style="display:none; color:#38bdf8; margin-top:10px;">Processing... Please wait...</div>
+        <div id="actionButtons" style="display:none; margin-top:20px; flex-direction: column; gap: 10px;">
+            <button id="downloadBtn" class="send-btn" style="width:100%; background: #10b981; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">DOWNLOAD HD</button>
+            <button id="resetBtn" class="send-btn" style="width:100%; background: #ef4444; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">HAPUS FOTO</button>
+        </div>
     </div>
 </div>
+
+<script>
+    const form = document.getElementById('enhanceForm');
+    const photoInput = document.getElementById('photoInput');
+    const container = document.getElementById('comparisonContainer');
+    const imgBefore = document.getElementById('imgBefore');
+    const imgAfter = document.getElementById('imgAfter');
+    const slider = document.getElementById('slider');
+    const wrapper = document.getElementById('imgBeforeWrapper');
+    const handle = document.getElementById('sliderHandle');
+    const loading = document.getElementById('loading');
+    const actionButtons = document.getElementById('actionButtons');
+
+    let resultUrl = "";
+
+    // Sinkronisasi Geser
+    slider.oninput = function() {
+        let val = this.value;
+        wrapper.style.width = val + "%";
+        handle.style.left = val + "%"; // Gerakkan lingkaran handle
+    };
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        loading.style.display = 'block';
+        form.style.display = 'none';
+        
+        // Preview Original
+        const reader = new FileReader();
+        reader.onload = (ev) => { imgBefore.src = ev.target.result; };
+        reader.readAsDataURL(photoInput.files[0]);
+
+        const formData = new FormData(form);
+        try {
+            const response = await fetch('/enhance', { method: 'POST', body: formData });
+            if (response.ok) {
+                const blob = await response.blob();
+                resultUrl = URL.createObjectURL(blob);
+                imgAfter.src = resultUrl;
+
+                imgAfter.onload = () => {
+                    // Kunci Dimensi Gambar agar tidak terpotong & sinkron
+                    const w = imgAfter.clientWidth;
+                    const h = imgAfter.clientHeight;
+                    imgBefore.style.width = w + "px";
+                    imgBefore.style.height = h + "px";
+                    
+                    loading.style.display = 'none';
+                    container.style.display = 'block';
+                    actionButtons.style.display = 'flex';
+                };
+            }
+        } catch (err) { 
+            alert("Error memproses!"); 
+            loading.style.display = 'none';
+            form.style.display = 'block';
+        }
+    };
+
+    // Tombol Download
+    document.getElementById('downloadBtn').onclick = () => {
+        const a = document.createElement('a');
+        a.href = resultUrl;
+        a.download = "HD_CATOVISION_" + Date.now() + ".jpg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    // Tombol Hapus (Kembali ke awal)
+    document.getElementById('resetBtn').onclick = () => {
+        container.style.display = 'none';
+        actionButtons.style.display = 'none';
+        form.style.display = 'block';
+        photoInput.value = "";
+        if(resultUrl) URL.revokeObjectURL(resultUrl);
+    };
+</script>
+
+<style>
+    /* Styling Garis Vertikal agar transparan di area slider */
+    #slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 4px;
+        height: 100vh;
+        background: transparent;
+        cursor: ew-resize;
+    }
+    #slider::-moz-range-thumb {
+        width: 4px;
+        height: 100vh;
+        background: transparent;
+        cursor: ew-resize;
+    }
+</style>
+
 
 <script>
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
@@ -337,6 +444,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
