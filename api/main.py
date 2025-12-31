@@ -58,7 +58,9 @@ def enhance_photo():
         return send_file(img_io, mimetype='image/jpeg', as_attachment=False)
     except Exception as e:
         return f"Error: {str(e)}", 500
-                @app.route("/remove-watermark", methods=["POST"])
+                
+
+@app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
@@ -66,37 +68,31 @@ def remove_watermark():
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # Resize sementara jika terlalu besar untuk mencegah memory crash di Vercel
+        # Proteksi Memori: Resize jika gambar > 1500px agar Vercel tidak crash
         original_size = img.size
         if max(original_size) > 1500:
             img.thumbnail((1500, 1500), Image.Resampling.LANCZOS)
         
         width, height = img.size
         
-        # 1. AUTO DETECT AREA (Fokus 20% area bawah untuk logo Gemini/AI)
-        roi_top = int(height * 0.80)
+        # 1. Deteksi Otomatis (ROI): Fokus pada 25% area bawah tempat logo Gemini berada
+        roi_top = int(height * 0.75)
         bottom_area = img.crop((0, roi_top, width, height))
         
-        # 2. CREATE MASK (Deteksi area putih terang khas watermark)
-        # Convert ke grayscale dan ambil pixel sangat terang (>235)
+        # 2. Masking Otomatis: Cari pixel putih terang (logo Gemini biasanya > 235)
         mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
         
-        # Pertebal mask agar tepian watermark ikut terhapus (Dilation)
+        # Pertebal mask (Dilation) agar tepian logo bersih
         mask = mask.filter(ImageFilter.MaxFilter(5))
-        # Haluskan tepian mask agar tidak patah
         mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
 
-        # 3. PENGHAPUSAN (Inpainting Sederhana)
-        # Buat patch dari area sekitar yang diblur kuat
+        # 3. Penghapusan: Tambal area mask dengan background yang diblur halus
         blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
-        
-        # Gabungkan area asli dengan area blur hanya pada bagian mask
         clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
         
-        # Tempel kembali ke gambar utama
+        # Satukan kembali gambar
         img.paste(clean_bottom, (0, roi_top))
         
-        # Kembalikan ke ukuran asli
         if img.size != original_size:
             img = img.resize(original_size, Image.Resampling.LANCZOS)
 
@@ -107,6 +103,7 @@ def remove_watermark():
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -203,6 +200,7 @@ def chat():
                 
 # Export app
 app = app
+
 
 
 
