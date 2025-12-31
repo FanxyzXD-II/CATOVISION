@@ -13,5 +13,4 @@ idna==3.11
 python-telegram-bot==22.5
 typing_extensions==4.15.0
 urllib3==2.6.2
-opencv-python-headless
 numpy
