@@ -144,15 +144,15 @@
 
 <div id="clear" class="section">
     <div class="card">
-        <h2 id="e-title" class="text-xl font-bold mb-2">AI Photo Enhancer</h2>
-        <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Geser garis tengah untuk melihat detail kejernihan.</p>
+        <h2 id="e-title" class="text-xl font-bold mb-2">✨ AI Photo Enhancer</h2>
+        <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Slide the center line to see the clarity details..</p>
         
         <form id="enhanceForm">
             <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">PROSES KE HD</button>
+            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Continue</button>
         </form>
 
-        <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">⚡ Memproses...</div>
+        <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">process...</div>
 
         <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0;">
             
@@ -171,8 +171,8 @@
         </div>
 
         <div id="actionButtons" style="display:none; margin-top:20px; flex-direction: column; gap: 10px;">
-            <button id="downloadBtn" class="send-btn" style="width:100%; background: #10b981; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">DOWNLOAD HD</button>
-            <button id="resetBtn" class="send-btn" style="width:100%; background: #ef4444; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">HAPUS FOTO</button>
+            <button id="downloadBtn" class="send-btn" style="width:100%; background: #22d3ee; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">download photo</button>
+            <button id="resetBtn" class="send-btn" style="width:100%; background: #ef4444; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">delete photo</button>
         </div>
     </div>
 </div>
@@ -444,6 +444,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
