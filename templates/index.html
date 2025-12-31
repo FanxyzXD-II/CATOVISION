@@ -48,7 +48,6 @@
     .user-bubble { align-self: flex-end; background: var(--accent); color: #020617; padding: 12px 18px; border-radius: 20px 20px 0 20px; font-size: 14px; max-width: 85%; font-weight: 500; }
     .ai-bubble { align-self: flex-start; background: var(--ai-bubble); padding: 15px; border-radius: 0 20px 20px 20px; font-size: 13.5px; border: 1px solid rgba(255,255,255,0.05); max-width: 90%; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
     
-    /* EFEK MENGETIK CURSOR */
     .typing::after { content: "●"; animation: blink 0.8s infinite; margin-left: 5px; color: var(--accent); font-size: 10px; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -80,7 +79,7 @@
     <a href="#" id="m-home" class="active" onclick="navTo('home')">Home</a>
     <a href="#" id="m-ai" onclick="navTo('ai')">AI Analyst</a>
     <a href="#" id="m-clear" onclick="navTo('clear')">AI Enhancer</a>
-      <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">Watermark Remover AI</a>
+    <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">AI Unwatermark</a>
 </nav>
 
 <div class="container">
@@ -89,10 +88,8 @@
             <img src="/static/uploads/100003748.jpg" class="logo-caton">
             <h1>$CATON</h1>
             <p id="h-desc">Meme coin pertama di Paxi L1 dengan utilitas AI</p>
-            
             <div style="font-size: 10px; color: #64748b; margin-bottom: 5px; font-weight: bold;">CONTRACT ADDRESS</div>
             <div class="ca-box" onclick="copyCA()">paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9</div>
-            
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-label" id="l-supply">Total Supply</span>
@@ -103,12 +100,8 @@
                     <span class="stat-val" id="val-holders">Loading...</span>
                 </div>
             </div>
-
-            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-btn">
-                Join Telegram Group
-            </a>
+            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-btn">Join Telegram Group</a>
         </div>
-        
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             {% for cat in cats %}
             <div style="background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 10px; text-align: center;">
@@ -123,15 +116,12 @@
             <div id="chatMessages" class="chat-messages">
                 <div class="ai-bubble" id="ai-greet">Welcome Trader! Provide asset name for CATOVISION AI analysis.</div>
             </div>
-            
             <div class="input-area">
                 <div id="previewWrap" class="preview-container">
                     <span class="close-preview" onclick="clearPreview()">×</span>
                     <img id="imgPreview">
                 </div>
-                
                 <div id="quickActions" style="display:flex; gap:8px; margin-bottom:12px; overflow-x:auto;"></div>
-                
                 <div class="input-row">
                     <label style="cursor:pointer; font-size:20px;">
                         <input type="file" id="aiFile" hidden onchange="previewImg(this)">📁
@@ -143,198 +133,84 @@
         </div>
     </div>
 
-<div id="clear" class="section">
-    <div class="card">
-        <h2 id="e-title" class="text-xl font-bold mb-2">✨ AI Photo Enhancer</h2>
-
-        <form id="enhanceForm">
-            <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Continue</button>
-        </form>
-
-        <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">please wait...</div>
-
-        <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0; background:#000;">
-
-          <span style="position:absolute; left:10px; bottom:10px; background:rgba(0,0,0,0.5); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:10; font-weight:bold; white-space:nowrap; pointer-events:none;">Before</span>
-
-          
-            <img id="imgBeforeStatic" style="width:100%; height:auto; display:block; object-fit: contain;">
-            
-            <div id="imgAfterWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2;">
-              
-            <span style="position:absolute; right:10px; bottom:10px; background:rgba(56,189,248,0.7); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:1; font-weight:bold; pointer-events:none;">After</span>
-              
-            <img id="imgAfter" style="position:absolute; top:0; left:0; object-fit: contain; object-position: left center;">
-            </div>
-
-            <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
-                <div style="display:flex; gap:3px;">
-                    <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid #38bdf8;"></div>
-                    <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #38bdf8;"></div>
+    <div id="clear" class="section">
+        <div class="card">
+            <h2 id="e-title">✨ AI Photo Enhancer</h2>
+            <form id="enhanceForm">
+                <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
+                <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Continue</button>
+            </form>
+            <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;">please wait...</div>
+            <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0; background:#000;">
+                <span style="position:absolute; left:10px; bottom:10px; background:rgba(0,0,0,0.5); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:10; font-weight:bold; pointer-events:none;">Before</span>
+                <img id="imgBeforeStatic" style="width:100%; height:auto; display:block; object-fit: contain;">
+                <div id="imgAfterWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2;">
+                    <span style="position:absolute; right:10px; bottom:10px; background:rgba(56,189,248,0.7); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:1; font-weight:bold; pointer-events:none;">After</span>
+                    <img id="imgAfter" style="position:absolute; top:0; left:0; object-fit: contain; object-position: left center;">
                 </div>
+                <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+                    <div style="display:flex; gap:3px;">
+                        <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid #38bdf8;"></div>
+                        <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #38bdf8;"></div>
+                    </div>
+                </div>
+                <input type="range" min="0" max="100" value="50" id="slider" style="position:absolute; top:0; left:0; width:100%; height:100%; -webkit-appearance:none; appearance:none; background:transparent; outline:none; margin:0; cursor:ew-resize; z-index:30;">
             </div>
-
-            <input type="range" min="0" max="100" value="50" id="slider" style="position:absolute; top:0; left:0; width:100%; height:100%; -webkit-appearance:none; appearance:none; background:transparent; outline:none; margin:0; cursor:ew-resize; z-index:30;">
+            <div id="actionButtons" style="display:none; margin-top:20px; flex-direction: column; gap: 10px;">
+                <button id="downloadBtn" class="send-btn" style="width:100%; background: #22d3ee; color:white;">download</button>
+                <button id="resetBtn" class="send-btn" style="width:100%; background: #ef4444; color:white;">delete</button>
+            </div>
         </div>
+    </div>
 
-        <div id="actionButtons" style="display:none; margin-top:20px; flex-direction: column; gap: 10px;">
-            <button id="downloadBtn" class="send-btn" style="width:100%; background: #22d3ee; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">download</button>
-            <button id="resetBtn" class="send-btn" style="width:100%; background: #ef4444; padding:15px; border:none; color:white; font-weight:bold; border-radius:8px; cursor:pointer;">delete</button>
+    <div id="unwatermark" class="section">
+        <div class="card">
+            <h2 id="u-title">🚫 AI Watermark Remover</h2>
+            <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(56,189,248,0.3);">
+                <p style="font-size: 11px; color: var(--accent); margin: 0;">✨ <b>Auto-Scan:</b> Mendeteksi otomatis logo Gemini dan teks di area bawah.</p>
+            </div>
+            <form id="wmForm">
+                <input type="file" id="wmInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
+                <button type="submit" id="wmBtn" class="send-btn" style="width:100%; padding:15px; background: #f43f5e; color: white;">Process & Erase</button>
+            </form>
+            <div id="wmLoading" style="display:none; color:#f43f5e; margin: 15px 0;">Menghapus watermark secara otomatis...</div>
+            <div id="wmResultContainer" style="display:none; margin-top:20px;">
+                <img id="imgWmResult" style="width:100%; border-radius:12px; border:1px solid var(--border); margin-bottom: 10px;">
+                <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #10b981; color: white;">Download Result</button>
+                <button onclick="location.reload()" class="send-btn" style="width:100%; background: #475569; color: white;">Reset</button>
+            </div>
         </div>
     </div>
 </div>
-  <nav id="sidebar" class="sidebar">
-    <a href="#" id="m-home" class="active" onclick="navTo('home')">Home</a>
-    <a href="#" id="m-ai" onclick="navTo('ai')">AI Analyst</a>
-    <a href="#" id="m-clear" onclick="navTo('clear')">AI Enhancer</a>
-    <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">AI Unwatermark</a>
-  </nav>
-  <div id="unwatermark" class="section">
-    <div class="card">
-        <h2 id="u-title">🚫 AI Watermark Remover</h2>
-        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(56,189,248,0.3);">
-            <p style="font-size: 11px; color: var(--accent); margin: 0;">
-                ✨ <b>Auto-Scan:</b> Mendeteksi otomatis logo Gemini dan teks di area bawah.
-            </p>
-        </div>
-
-        <form id="wmForm">
-            <input type="file" id="wmInput" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-            <button type="submit" id="wmBtn" class="send-btn" style="width:100%; padding:15px; background: #f43f5e; color: white; border: none;">Process & Erase</button>
-        </form>
-
-        <div id="wmLoading" style="display:none; color:#f43f5e; margin: 15px 0;" class="animate-pulse">Menghapus watermark secara otomatis...</div>
-
-        <div id="wmResultContainer" style="display:none; margin-top:20px;">
-            <img id="imgWmResult" style="width:100%; border-radius:12px; border:1px solid var(--border); margin-bottom: 10px;">
-            <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #10b981; color: white; border: none; padding: 12px; margin-bottom: 8px;">Download Result</button>
-            <button onclick="location.reload()" class="send-btn" style="width:100%; background: #475569; color: white; border: none; padding: 12px;">Reset</button>
-        </div>
-    </div>
-  </div>
-  
 
 <script>
-    const form = document.getElementById('enhanceForm');
-    const photoInput = document.getElementById('photoInput');
-    const container = document.getElementById('comparisonContainer');
-    const imgBeforeStatic = document.getElementById('imgBeforeStatic');
-    const imgAfter = document.getElementById('imgAfter');
-    const slider = document.getElementById('slider');
-    const wrapper = document.getElementById('imgAfterWrapper');
-    const handle = document.getElementById('sliderHandle');
-    const loading = document.getElementById('loading');
-    const actionButtons = document.getElementById('actionButtons');
-
-    let resultUrl = "";
-
-    slider.oninput = function() {
-        let val = this.value + "%";
-        wrapper.style.width = val;
-        handle.style.left = val;
-    };
-
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        loading.style.display = 'block';
-        form.style.display = 'none';
-        
-        // Load pratinjau asli (Sebagai background kanan)
-        const reader = new FileReader();
-        reader.onload = (ev) => { 
-            imgBeforeStatic.src = ev.target.result; 
-        };
-        reader.readAsDataURL(photoInput.files[0]);
-
-        const formData = new FormData(form);
-        try {
-            const response = await fetch('/enhance', { method: 'POST', body: formData });
-            if (response.ok) {
-                const blob = await response.blob();
-                resultUrl = URL.createObjectURL(blob);
-                imgAfter.src = resultUrl;
-
-                imgAfter.onload = () => {
-                    // SINKRONISASI UKURAN
-                    const w = imgBeforeStatic.clientWidth;
-                    const h = imgBeforeStatic.clientHeight;
-                    
-                    imgAfter.style.width = w + "px";
-                    imgAfter.style.height = h + "px";
-                    
-                    loading.style.display = 'none';
-                    container.style.display = 'block';
-                    actionButtons.style.display = 'flex';
-                };
-            }
-        } catch (err) { 
-            alert("Error!"); 
-            loading.style.display = 'none';
-            form.style.display = 'block';
-        }
-    };
-
-    document.getElementById('downloadBtn').onclick = () => {
-        const a = document.createElement('a');
-        a.href = resultUrl;
-        a.download = "HD_RESULT.jpg";
-        a.click();
-    };
-
-    document.getElementById('resetBtn').onclick = () => {
-        location.reload();
-    };
-</script>
-
-<style>
-    #slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 4px;
-        height: 100vh;
-        background: transparent;
-        cursor: ew-resize;
-    }
-</style>
-
-<script>
+// --- BLOCKCHAIN DATA ---
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
 const CONTRACT_ADDR = "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9";
 
 async function updateBlockchainData() {
     try {
-        // 1. Ambil Data Total Supply & Detail Asset
         const response = await fetch(`${PAXI_REST_API}/assets/${CONTRACT_ADDR}`);
         const data = await response.json();
-
         if (data) {
-            // Update Total Supply (Jika ingin otomatis dari blockchain)
-            // Jika ingin tetap manual 1M, bagian ini bisa dihapus
             if (data.supply) {
                 const supply = parseFloat(data.supply) / 1000000;
                 document.getElementById('val-supply').innerText = supply.toLocaleString('id-ID');
             }
-
-            // 2. Update Jumlah Pemegang (Holders)
-            // Mengambil field 'holders' atau 'holders_count' dari API Winscan
             if (data.holders_count || data.holders) {
                 const holders = data.holders_count || data.holders;
                 document.getElementById('val-holders').innerText = holders.toLocaleString('id-ID');
             }
         }
     } catch (error) {
-        console.error("Gagal mengambil data blockchain:", error);
-        // Fallback jika API error
         document.getElementById('val-supply').innerText = "1,000,000,000";
         document.getElementById('val-holders').innerText = "45"; 
     }
 }
-
-// Jalankan saat halaman dibuka
 updateBlockchainData();
-
-// Perbarui setiap 1 menit (60000 ms)
 setInterval(updateBlockchainData, 60000);
+
+// --- MULTI LANGUAGE ---
 const i18n = {
     id: {
         h_desc: "Meme coin pertama di Paxi L1 dengan utilitas AI",
@@ -342,9 +218,10 @@ const i18n = {
         l_supply: "Total Pasokan", l_holders: "Pemegang",
         ai_greet: "Halo Trader! Masukkan nama aset atau upload chart untuk CATOVISION AI analisa.",
         e_title: "✨ Peningkat Foto AI",
-        send: "Kirim", loading: "CATOVISION AI sedang menganalisis...",
+        u_title: "🚫 Hapus Watermark AI",
+        send: "Kirim", loading: "Menganalisis...",
         q1: "📊Analisa BTC", q2: "🎯 Sinyal SOL",
-        m_home: "Beranda", m_ai: "Analisis AI", m_clear: "Penjernih AI"
+        m_home: "Beranda", m_ai: "Analisis AI", m_clear: "Penjernih AI", m_unwatermark: "Hapus Watermark"
     },
     en: {
         h_desc: "First meme coin on Paxi L1 with AI utility",
@@ -352,9 +229,10 @@ const i18n = {
         l_supply: "Total Supply", l_holders: "Holders",
         ai_greet: "Hello Trader! Provide asset name or upload a chart for CATOVISION AI analysis.",
         e_title: "✨ AI Photo Enhancer",
-        send: "Send", loading: "CATOVISION AI is analyzing...",
+        u_title: "🚫 AI Watermark Remover",
+        send: "Send", loading: "Analyzing...",
         q1: "📊 BTC Analysis", q2: "🎯 SOL Signal",
-        m_home: "Home", m_ai: "AI Analyst", m_clear: "AI Enhancer"
+        m_home: "Home", m_ai: "AI Analyst", m_clear: "AI Enhancer", m_unwatermark: "Unwatermark"
     },
     zh: {
         h_desc: "Paxi L1 上首个具备 AI 实用工具的模因币",
@@ -362,9 +240,10 @@ const i18n = {
         l_supply: "总供应量", l_holders: "持有者",
         ai_greet: "交易者您好，请输入资产名称或上传图表以供 CATOVISION AI 分析.。",
         e_title: "✨ AI 照片增强",
-        send: "发送", loading: "CATOVISION AI 分析",
+        u_title: "🚫 AI 水印移除",
+        send: "发送", loading: "分析中...",
         q1: "📊 BTC 分析", q2: "🎯 SOL 信号",
-        m_home: "首页", m_ai: "AI 分析", m_clear: "AI照片增强"
+        m_home: "首页", m_ai: "AI 分析", m_clear: "AI照片增强", m_unwatermark: "移除水印"
     }
 };
 
@@ -394,16 +273,19 @@ function changeLang(l, btn) {
     document.getElementById('l-holders').innerText = i18n[l].l_holders;
     document.getElementById('ai-greet').innerText = i18n[l].ai_greet;
     document.getElementById('e-title').innerText = i18n[l].e_title;
+    document.getElementById('u-title').innerText = i18n[l].u_title;
     document.getElementById('btn-send-text').innerText = i18n[l].send;
     document.getElementById('m-home').innerText = i18n[l].m_home;
     document.getElementById('m-ai').innerText = i18n[l].m_ai;
     document.getElementById('m-clear').innerText = i18n[l].m_clear;
+    document.getElementById('m-unwatermark').innerText = i18n[l].m_unwatermark;
     document.getElementById('quickActions').innerHTML = `
         <button onclick="setQuery('${i18n[l].q1}')" style="background:rgba(56,189,248,0.1); border:1px solid var(--accent); color:var(--accent); padding:8px 15px; border-radius:12px; font-size:11px; cursor:pointer;">${i18n[l].q1}</button>
         <button onclick="setQuery('${i18n[l].q2}')" style="background:rgba(56,189,248,0.1); border:1px solid var(--accent); color:var(--accent); padding:8px 15px; border-radius:12px; font-size:11px; cursor:pointer;">${i18n[l].q2}</button>
     `;
 }
 
+// --- AI CHAT LOGIC ---
 function previewImg(input) {
     const wrap = document.getElementById('previewWrap');
     if (input.files && input.files[0]) {
@@ -428,9 +310,7 @@ function typeWriter(element, text, speed = 15) {
             setTimeout(type, speed);
             const box = document.getElementById('chatMessages');
             box.scrollTop = box.scrollHeight;
-        } else {
-            element.classList.remove("typing");
-        }
+        } else { element.classList.remove("typing"); }
     }
     type();
 }
@@ -441,69 +321,96 @@ async function askAI() {
     const box = document.getElementById('chatMessages');
     const val = input.value.trim();
     if(!val && !file) return;
-
     box.innerHTML += `<div class="user-bubble">${file ? `<img src="${document.getElementById('imgPreview').src}" style="max-width:100%; border-radius:12px; margin-bottom:8px; display:block;">` : ''}${val}</div>`;
     input.value = ''; clearPreview();
-
     const loadId = "L" + Date.now();
     box.innerHTML += `<div class="ai-bubble" id="${loadId}">${i18n[curLang].loading}</div>`;
     box.scrollTop = box.scrollHeight;
-
     const fd = new FormData();
-    fd.append('query', val);
-    fd.append('lang', curLang);
+    fd.append('query', val); fd.append('lang', curLang);
     if(file) fd.append('image', file);
-
     try {
         const res = await fetch('/chat', { method: 'POST', body: fd });
         const data = await res.json();
         typeWriter(document.getElementById(loadId), data.reply, 15);
-    } catch { 
-        document.getElementById(loadId).innerText = "Connection Error."; 
-    }
+    } catch { document.getElementById(loadId).innerText = "Connection Error."; }
 }
-
 function setQuery(v) { document.getElementById('userQuery').value = v; askAI(); }
+
+// --- ENHANCER LOGIC ---
+const enhanceForm = document.getElementById('enhanceForm');
+const slider = document.getElementById('slider');
+const wrapper = document.getElementById('imgAfterWrapper');
+const handle = document.getElementById('sliderHandle');
+
+slider.oninput = function() {
+    let val = this.value + "%";
+    wrapper.style.width = val;
+    handle.style.left = val;
+};
+
+enhanceForm.onsubmit = async (e) => {
+    e.preventDefault();
+    document.getElementById('loading').style.display = 'block';
+    enhanceForm.style.display = 'none';
+    const reader = new FileReader();
+    reader.onload = (ev) => { document.getElementById('imgBeforeStatic').src = ev.target.result; };
+    reader.readAsDataURL(document.getElementById('photoInput').files[0]);
+    const formData = new FormData(enhanceForm);
+    try {
+        const response = await fetch('/enhance', { method: 'POST', body: formData });
+        if (response.ok) {
+            const blob = await response.blob();
+            const resUrl = URL.createObjectURL(blob);
+            const imgAfter = document.getElementById('imgAfter');
+            imgAfter.src = resUrl;
+            imgAfter.onload = () => {
+                imgAfter.style.width = document.getElementById('imgBeforeStatic').clientWidth + "px";
+                imgAfter.style.height = document.getElementById('imgBeforeStatic').clientHeight + "px";
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('comparisonContainer').style.display = 'block';
+                document.getElementById('actionButtons').style.display = 'flex';
+                document.getElementById('downloadBtn').onclick = () => {
+                    const a = document.createElement('a'); a.href = resUrl; a.download = "HD.jpg"; a.click();
+                };
+            };
+        }
+    } catch { alert("Error!"); location.reload(); }
+};
+document.getElementById('resetBtn').onclick = () => { location.reload(); };
+
+// --- UNWATERMARK LOGIC ---
+const wmForm = document.getElementById('wmForm');
+wmForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const loading = document.getElementById('wmLoading');
+    const resultCont = document.getElementById('wmResultContainer');
+    const wmBtn = document.getElementById('wmBtn');
+    loading.style.display = 'block';
+    wmBtn.style.display = 'none';
+    const fd = new FormData();
+    fd.append('photo', document.getElementById('wmInput').files[0]);
+    try {
+        const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            document.getElementById('imgWmResult').src = url;
+            loading.style.display = 'none';
+            resultCont.style.display = 'block';
+            document.getElementById('downloadWmBtn').onclick = () => {
+                const a = document.createElement('a'); a.href = url; a.download = "CLEAN.jpg"; a.click();
+            };
+        } else { throw new Error(); }
+    } catch { alert("Gagal memproses."); location.reload(); }
+};
+
 changeLang('id', document.querySelector('.lang-btn'));
 </script>
+
+<style>
+    #slider::-webkit-slider-thumb { -webkit-appearance: none; width: 4px; height: 100vh; background: transparent; cursor: ew-resize; }
+</style>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
