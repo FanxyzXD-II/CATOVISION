@@ -59,7 +59,6 @@ def enhance_photo():
     except Exception as e:
         return f"Error: {str(e)}", 500
                 
-
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
@@ -68,38 +67,34 @@ def remove_watermark():
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # Proteksi Memori: Resize jika gambar > 1500px agar Vercel tidak crash
+        # Memory Guard: Resize if image is too large for Vercel RAM
         original_size = img.size
         if max(original_size) > 1500:
             img.thumbnail((1500, 1500), Image.Resampling.LANCZOS)
         
         width, height = img.size
         
-        # 1. Deteksi Otomatis (ROI): Fokus pada 25% area bawah tempat logo Gemini berada
+        # 1. Detect Gemini Logo Area (Bottom 25%)
         roi_top = int(height * 0.75)
         bottom_area = img.crop((0, roi_top, width, height))
         
-        # 2. Masking Otomatis: Cari pixel putih terang (logo Gemini biasanya > 235)
+        # 2. Auto-Mask: Find bright white pixels (Gemini logo style)
         mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
-        
-        # Pertebal mask (Dilation) agar tepian logo bersih
-        mask = mask.filter(ImageFilter.MaxFilter(5))
+        mask = mask.filter(ImageFilter.MaxFilter(5)) # Dilate
         mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
 
-        # 3. Penghapusan: Tambal area mask dengan background yang diblur halus
+        # 3. Erase: Simple Inpainting via Blur
         blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
         clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
         
-        # Satukan kembali gambar
+        # Paste back and restore size
         img.paste(clean_bottom, (0, roi_top))
-        
         if img.size != original_size:
             img = img.resize(original_size, Image.Resampling.LANCZOS)
 
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95)
+        img.save(img_io, 'JPEG', quality=90)
         img_io.seek(0)
-        
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -200,6 +195,7 @@ def chat():
                 
 # Export app
 app = app
+
 
 
 
