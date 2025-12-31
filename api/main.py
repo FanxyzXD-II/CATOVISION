@@ -152,54 +152,62 @@ def chat():
         return jsonify({"reply": "Koneksi timeout. Pastikan file tidak terlalu besar dan API Key benar."})
 
 # Tambahkan import ini di atas
-
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
-        return "File tidak ditemukan", 400
+        return "No file uploaded", 400
     try:
         file = request.files['photo']
+        # Gunakan Pillow (PIL) karena jauh lebih ringan di Vercel daripada OpenCV
         img = Image.open(file.stream).convert("RGB")
+        
+        # 1. Resize sementara jika gambar terlalu besar untuk menghemat RAM Vercel
+        original_size = img.size
+        if max(original_size) > 1200:
+            img.thumbnail((1200, 1200))
+        
         width, height = img.size
+        
+        # 2. AUTO DETECT LOGO GEMINI (Fokus 25% area bawah)
+        roi_top = int(height * 0.75)
+        bottom_box = (0, roi_top, width, height)
+        bottom_area = img.crop(bottom_box)
+        
+        # Buat mask untuk area putih/terang (ciri khas logo Gemini)
+        # Convert ke Grayscale -> Thresholding
+        mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
+        
+        # Pertebal mask sedikit agar penghapusan bersih
+        mask = mask.filter(ImageFilter.MaxFilter(5))
+        
+        # 3. PENGHAPUSAN (Inpainting Sederhana)
+        # Gunakan area sekitar atau blur kuat untuk menutupi logo
+        blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
+        
+        # Gabungkan: area asli + area blur (hanya di bagian mask)
+        clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
+        
+        # Tempel kembali ke gambar utama
+        img.paste(clean_bottom, (0, roi_top))
+        
+        # Kembalikan ke ukuran asli jika tadi di-resize
+        if img.size != original_size:
+            img = img.resize(original_size, Image.LANCZOS)
 
-        # --- AUTO DETECT WATERMARK (Logic untuk Logo Gemini/Pojok) ---
-        # Kita membuat 'mask' manual dengan mendeteksi area putih terang di 30% area bawah
-        
-        # Pisahkan area bawah (ROI)
-        bottom_area = img.crop((0, int(height * 0.7), width, height))
-        
-        # Deteksi area putih (seperti logo Gemini) menggunakan filter
-        # Kita ubah ke grayscale dan cari pixel yang nilainya > 230 (sangat terang)
-        mask = bottom_area.convert("L").point(lambda x: 255 if x > 230 else 0, mode='1')
-        
-        # Perluas mask sedikit agar area hapusnya bersih (Dilation)
-        mask = mask.filter(ImageFilter.MaxFilter(3))
-
-        # --- TAHAP PENGHAPUSAN (Inpainting Sederhana via Pillow) ---
-        # Karena Vercel tidak mendukung cv2.inpaint, kita gunakan 
-        # teknik 'Content-Aware' sederhana dengan blur pada area mask
-        blurred_bottom = bottom_area.filter(ImageFilter.GaussianBlur(radius=10))
-        
-        # Tempelkan kembali area yang sudah diblur hanya pada bagian mask (watermark)
-        clean_bottom = Image.composite(blurred_bottom, bottom_area, mask)
-        
-        # Satukan kembali ke gambar asli
-        img.paste(clean_bottom, (0, int(height * 0.7)))
-
-        # Simpan hasil
+        # 4. KIRIM HASIL
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95)
+        img.save(img_io, 'JPEG', quality=90)
         img_io.seek(0)
         
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
-        # Ini akan membantu Anda melihat error di log Vercel jika terjadi crash lagi
-        print(f"Error Detail: {str(e)}")
-        return f"Error: {str(e)}", 500
+        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
 
                 
 # Export app
 app = app
+
 
 
 
