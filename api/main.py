@@ -24,31 +24,34 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur AI Photo Enhancer (Logika Diperkuat)"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # 1. TAHAP DENOISING (Membersihkan bintik agar tidak pecah saat ditajamkan)
-        img = img.filter(ImageFilter.SMOOTH_MORE)
+        # --- TAHAP 1: ANTI-NOISE & PENGHALUSAN (SMOOTHING) ---
+        # Menghilangkan bintik-bintik (noise) agar kulit terlihat mulus
+        for _ in range(2):
+            img = img.filter(ImageFilter.SMOOTH_MORE)
         
-        # 2. TAHAP PENAJAMAN EKSTRIM (Unsharp Mask)
-        # radius diperbesar agar blur hilang, percent dinaikkan untuk ketajaman
-        img = img.filter(ImageFilter.UnsharpMask(radius=3, percent=250, threshold=0))
+        # --- TAHAP 2: PENAJAMAN ULTRA (SHARPENING) ---
+        # Mengembalikan detail pada mata, rambut, dan tepi objek agar tajam
+        # Radius 2 dengan Percent 300-400 memberikan efek HD yang kuat
+        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=400, threshold=1))
         
-        # 3. TAHAP DETAIL ENHANCEMENT
+        # --- TAHAP 3: DETAIL ENHANCEMENT ---
         img = img.filter(ImageFilter.DETAIL)
-        img = img.filter(ImageFilter.SHARPEN)
         
-        # 4. PENYESUAIAN KONTRAS & WARNA (Agar terlihat HD)
-        img = ImageEnhance.Sharpness(img).enhance(2.0)
+        # --- TAHAP 4: PENYESUAIAN WARNA & KONTRAS ---
+        # Menaikkan kontras agar gambar tidak kusam/pucat
         img = ImageEnhance.Contrast(img).enhance(1.3)
+        # Menaikkan ketajaman piksel akhir
+        img = ImageEnhance.Sharpness(img).enhance(2.5)
+        # Sedikit menaikkan saturasi agar warna lebih hidup
         img = ImageEnhance.Color(img).enhance(1.1)
         
         img_io = io.BytesIO()
-        # Gunakan quality 100 agar tidak ada penurunan kualitas saat dikirim
         img.save(img_io, 'JPEG', quality=100, subsampling=0)
         img_io.seek(0)
         
@@ -150,6 +153,7 @@ def chat():
 
 # Export app
 app = app
+
 
 
 
