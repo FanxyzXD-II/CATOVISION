@@ -3,13 +3,8 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/main.py" }
   ]
-  "functions": {
-    "api/main.py": {
-      "maxDuration": 20,
-      "memory": 1024
-    }
-  }
 }
+
 
 
 
