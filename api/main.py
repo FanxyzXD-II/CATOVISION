@@ -3,7 +3,7 @@ import io
 import base64
 import requests
 from flask import Flask, render_template, request, jsonify, send_file
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
 
 # Path disesuaikan untuk struktur folder Vercel
 app = Flask(__name__, 
@@ -24,19 +24,32 @@ def index():
 
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
-    """Fitur AI Photo Enhancer (Kualitas Tinggi Tetap Dipertahankan)"""
+    """Fitur AI Photo Enhancer Pro (Mengurangi Blur & Meningkatkan Detail)"""
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # Peningkatan Ketajaman dan Kontras
-        img = ImageEnhance.Sharpness(img).enhance(2.5)
-        img = ImageEnhance.Contrast(img).enhance(1.4)
+        # --- PERBAIKAN LOGIKA PENJERNIH ---
         
+        # 1. Mengurangi Blur dengan Unsharp Mask (Teknik Profesional)
+        # radius=2 (lingkup penajaman), percent=150 (kekuatan), threshold=3 (agar noise halus tidak ikut tajam)
+        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+        
+        # 2. Detail Enhancement (Menonjolkan tekstur halus)
+        img = img.filter(ImageFilter.DETAIL)
+        
+        # 3. Penyesuaian Akhir (Kontras & Warna agar lebih 'Deep')
+        img = ImageEnhance.Sharpness(img).enhance(1.4) # Penajaman tambahan tipis
+        img = ImageEnhance.Contrast(img).enhance(1.2)  # Menaikkan kontras agar gambar tidak 'flat'
+        img = ImageEnhance.Color(img).enhance(1.1)     # Sedikit menaikkan saturasi
+        
+        # --- SELESAI PERBAIKAN ---
+
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95)
+        # Menggunakan subsampling=0 dan quality=95 untuk menjaga kejernihan piksel
+        img.save(img_io, 'JPEG', quality=95, subsampling=0)
         img_io.seek(0)
         return send_file(img_io, mimetype='image/jpeg', as_attachment=True, download_name="gambar_HD.jpg")
     except Exception as e:
@@ -136,5 +149,6 @@ def chat():
 
 # Export app
 app = app
+
 
 
