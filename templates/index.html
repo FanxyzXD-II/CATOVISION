@@ -134,13 +134,13 @@
                 <div class="input-row">
                     <label style="cursor:pointer; font-size:20px;">
                         <input type="file" id="aiFile" hidden onchange="previewImg(thi<div id="clear" class="section">
-    <div class="card">
-        <h2 id="e-title" class="text-xl font-bold mb-2">AI Photo Enhancer</h2>
-        <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Geser garis tengah untuk melihat detail.</p>
-        
-        <form id="enhanceForm">
-            <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-            <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Loading...</button>
+    <div id="clear" class="section">
+        <div class="card">
+            <h2 id="e-title">AI Photo Enhancer</h2>
+            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Convert blurry photos to HD.</p>
+            <form action="/enhance" method="post" enctype="multipart/form-data">
+                <input type="file" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
+                <button type="submit" class="send-btn" style="width:100%; padding:15px;">Process to HD</button>
         </form>
 
         <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">⚡ Memproses...</div>
@@ -488,6 +488,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
