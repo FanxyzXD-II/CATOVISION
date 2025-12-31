@@ -58,6 +58,55 @@ def enhance_photo():
         return send_file(img_io, mimetype='image/jpeg', as_attachment=False)
     except Exception as e:
         return f"Error: {str(e)}", 500
+                @app.route("/remove-watermark", methods=["POST"])
+def remove_watermark():
+    if 'photo' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    try:
+        file = request.files['photo']
+        img = Image.open(file.stream).convert("RGB")
+        
+        # Resize sementara jika terlalu besar untuk mencegah memory crash di Vercel
+        original_size = img.size
+        if max(original_size) > 1500:
+            img.thumbnail((1500, 1500), Image.Resampling.LANCZOS)
+        
+        width, height = img.size
+        
+        # 1. AUTO DETECT AREA (Fokus 20% area bawah untuk logo Gemini/AI)
+        roi_top = int(height * 0.80)
+        bottom_area = img.crop((0, roi_top, width, height))
+        
+        # 2. CREATE MASK (Deteksi area putih terang khas watermark)
+        # Convert ke grayscale dan ambil pixel sangat terang (>235)
+        mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
+        
+        # Pertebal mask agar tepian watermark ikut terhapus (Dilation)
+        mask = mask.filter(ImageFilter.MaxFilter(5))
+        # Haluskan tepian mask agar tidak patah
+        mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
+
+        # 3. PENGHAPUSAN (Inpainting Sederhana)
+        # Buat patch dari area sekitar yang diblur kuat
+        blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
+        
+        # Gabungkan area asli dengan area blur hanya pada bagian mask
+        clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
+        
+        # Tempel kembali ke gambar utama
+        img.paste(clean_bottom, (0, roi_top))
+        
+        # Kembalikan ke ukuran asli
+        if img.size != original_size:
+            img = img.resize(original_size, Image.Resampling.LANCZOS)
+
+        img_io = io.BytesIO()
+        img.save(img_io, 'JPEG', quality=95)
+        img_io.seek(0)
+        
+        return send_file(img_io, mimetype='image/jpeg')
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -151,62 +200,10 @@ def chat():
     except Exception as e:
         return jsonify({"reply": "Koneksi timeout. Pastikan file tidak terlalu besar dan API Key benar."})
 
-# Tambahkan import ini di atas
-@app.route("/remove-watermark", methods=["POST"])
-def remove_watermark():
-    if 'photo' not in request.files:
-        return "No file uploaded", 400
-    try:
-        file = request.files['photo']
-        # Gunakan Pillow (PIL) karena jauh lebih ringan di Vercel daripada OpenCV
-        img = Image.open(file.stream).convert("RGB")
-        
-        # 1. Resize sementara jika gambar terlalu besar untuk menghemat RAM Vercel
-        original_size = img.size
-        if max(original_size) > 1200:
-            img.thumbnail((1200, 1200))
-        
-        width, height = img.size
-        
-        # 2. AUTO DETECT LOGO GEMINI (Fokus 25% area bawah)
-        roi_top = int(height * 0.75)
-        bottom_box = (0, roi_top, width, height)
-        bottom_area = img.crop(bottom_box)
-        
-        # Buat mask untuk area putih/terang (ciri khas logo Gemini)
-        # Convert ke Grayscale -> Thresholding
-        mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
-        
-        # Pertebal mask sedikit agar penghapusan bersih
-        mask = mask.filter(ImageFilter.MaxFilter(5))
-        
-        # 3. PENGHAPUSAN (Inpainting Sederhana)
-        # Gunakan area sekitar atau blur kuat untuk menutupi logo
-        blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
-        
-        # Gabungkan: area asli + area blur (hanya di bagian mask)
-        clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
-        
-        # Tempel kembali ke gambar utama
-        img.paste(clean_bottom, (0, roi_top))
-        
-        # Kembalikan ke ukuran asli jika tadi di-resize
-        if img.size != original_size:
-            img = img.resize(original_size, Image.LANCZOS)
-
-        # 4. KIRIM HASIL
-        img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=90)
-        img_io.seek(0)
-        
-        return send_file(img_io, mimetype='image/jpeg')
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": str(e)}), 500
-
                 
 # Export app
 app = app
+
 
 
 
