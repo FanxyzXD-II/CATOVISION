@@ -153,15 +153,15 @@
 
         <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;" class="animate-pulse text-center">please wait...</div>
 
-        <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0; user-select: none;">
+        <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0; background:#000;">
             
-            <img id="imgAfter" style="width:100%; height:auto; display:block; object-fit: contain;">
+            <img id="imgBeforeStatic" style="width:100%; height:auto; display:block; object-fit: contain;">
             
-            <div id="imgBeforeWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2;">
-                <img id="imgBefore" style="position:absolute; top:0; left:0; object-fit: contain; object-position: left center;">
+            <div id="imgAfterWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2;">
+                <img id="imgAfter" style="position:absolute; top:0; left:0; object-fit: contain; object-position: left center;">
             </div>
 
-            <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+            <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
                 <div style="display:flex; gap:3px;">
                     <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid #38bdf8;"></div>
                     <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #38bdf8;"></div>
@@ -182,17 +182,16 @@
     const form = document.getElementById('enhanceForm');
     const photoInput = document.getElementById('photoInput');
     const container = document.getElementById('comparisonContainer');
-    const imgBefore = document.getElementById('imgBefore');
+    const imgBeforeStatic = document.getElementById('imgBeforeStatic');
     const imgAfter = document.getElementById('imgAfter');
     const slider = document.getElementById('slider');
-    const wrapper = document.getElementById('imgBeforeWrapper');
+    const wrapper = document.getElementById('imgAfterWrapper');
     const handle = document.getElementById('sliderHandle');
     const loading = document.getElementById('loading');
     const actionButtons = document.getElementById('actionButtons');
 
     let resultUrl = "";
 
-    // Fungsi Menggerakkan Garis & Lingkaran secara Sinkron
     slider.oninput = function() {
         let val = this.value + "%";
         wrapper.style.width = val;
@@ -204,10 +203,10 @@
         loading.style.display = 'block';
         form.style.display = 'none';
         
-        // Membaca pratinjau foto asli
+        // Load pratinjau asli (Sebagai background kanan)
         const reader = new FileReader();
         reader.onload = (ev) => { 
-            imgBefore.src = ev.target.result; 
+            imgBeforeStatic.src = ev.target.result; 
         };
         reader.readAsDataURL(photoInput.files[0]);
 
@@ -220,12 +219,12 @@
                 imgAfter.src = resultUrl;
 
                 imgAfter.onload = () => {
-                    // PENTING: Mengunci ukuran Before sama persis dengan After yang dirender
-                    const w = imgAfter.clientWidth;
-                    const h = imgAfter.clientHeight;
+                    // SINKRONISASI UKURAN
+                    const w = imgBeforeStatic.clientWidth;
+                    const h = imgBeforeStatic.clientHeight;
                     
-                    imgBefore.style.width = w + "px";
-                    imgBefore.style.height = h + "px";
+                    imgAfter.style.width = w + "px";
+                    imgAfter.style.height = h + "px";
                     
                     loading.style.display = 'none';
                     container.style.display = 'block';
@@ -233,7 +232,7 @@
                 };
             }
         } catch (err) { 
-            alert("Error memproses!"); 
+            alert("Error!"); 
             loading.style.display = 'none';
             form.style.display = 'block';
         }
@@ -242,23 +241,16 @@
     document.getElementById('downloadBtn').onclick = () => {
         const a = document.createElement('a');
         a.href = resultUrl;
-        a.download = "HD_CATOVISION_" + Date.now() + ".jpg";
-        document.body.appendChild(a);
+        a.download = "HD_RESULT.jpg";
         a.click();
-        document.body.removeChild(a);
     };
 
     document.getElementById('resetBtn').onclick = () => {
-        container.style.display = 'none';
-        actionButtons.style.display = 'none';
-        form.style.display = 'block';
-        photoInput.value = "";
-        if(resultUrl) URL.revokeObjectURL(resultUrl);
+        location.reload();
     };
 </script>
 
 <style>
-    /* Menghilangkan thumb bawaan agar slider benar-benar transparan */
     #slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         width: 4px;
@@ -266,13 +258,8 @@
         background: transparent;
         cursor: ew-resize;
     }
-    #slider::-moz-range-thumb {
-        width: 4px;
-        height: 100vh;
-        background: transparent;
-        cursor: ew-resize;
-    }
 </style>
+
 
 <script>
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
@@ -445,6 +432,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </script>
 </body>
 </html>
+
 
 
 
