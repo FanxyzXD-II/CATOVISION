@@ -1,7 +1,7 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/(.*)", "destination": "main.py" }
+    { "source": "/(.*)", "destination": "api/main.py" }
   ],
   "functions": {
     "main.py": {
@@ -10,3 +10,4 @@
     }
   }
 }
+
