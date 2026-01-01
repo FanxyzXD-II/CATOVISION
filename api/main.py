@@ -61,43 +61,48 @@ def enhance_photo():
                 
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
-    if 'photo' not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+    # Gunakan 'photo' karena ini yang dikirim oleh JavaScript Anda
+    file = request.files.get('photo') 
+    if not file:
+        return jsonify({"error": "File tidak ditemukan dalam request"}), 400
+    
     try:
-        file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
         
-        # Memory Guard: Resize if image is too large for Vercel RAM
+        # Memory Guard: Mengecilkan gambar agar tidak crash di RAM Vercel
         original_size = img.size
-        if max(original_size) > 1500:
-            img.thumbnail((1500, 1500), Image.Resampling.LANCZOS)
+        if max(original_size) > 1200:
+            img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
         
         width, height = img.size
         
-        # 1. Detect Gemini Logo Area (Bottom 25%)
+        # Fokus deteksi pada 25% area bawah (lokasi logo Gemini)
         roi_top = int(height * 0.75)
         bottom_area = img.crop((0, roi_top, width, height))
         
-        # 2. Auto-Mask: Find bright white pixels (Gemini logo style)
+        # Masking otomatis untuk pixel sangat terang (>235)
         mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
-        mask = mask.filter(ImageFilter.MaxFilter(5)) # Dilate
-        mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
-
-        # 3. Erase: Simple Inpainting via Blur
+        mask = mask.filter(ImageFilter.MaxFilter(5)) # Pertebal mask
+        
+        # Inpainting sederhana menggunakan blur
         blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
         clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
         
-        # Paste back and restore size
         img.paste(clean_bottom, (0, roi_top))
+        
+        # Kembalikan ke ukuran asli sebelum dikirim
         if img.size != original_size:
             img = img.resize(original_size, Image.Resampling.LANCZOS)
 
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=90)
+        img.save(img_io, 'JPEG', quality=85)
         img_io.seek(0)
+        
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # Cetak error ke log Vercel untuk diagnosa lebih lanjut
+        print(f"Error proses WM: {str(e)}")
+        return jsonify({"error": "Gagal mengolah gambar"}), 500
 
 
 @app.route("/chat", methods=["POST"])
@@ -195,6 +200,7 @@ def chat():
                 
 # Export app
 app = app
+
 
 
 
