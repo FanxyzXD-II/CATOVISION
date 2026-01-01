@@ -66,9 +66,10 @@ def remove_watermark():
     try:
         file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
-        original_size = img.size
+        original_size = img.size  # Menyimpan ukuran asli sebelum kompresi
         
-        # Batasi resolusi untuk performa serverless
+        # --- TAHAP KOMPRESI (RINGAN UNTUK SERVER) ---
+        # Membatasi resolusi maksimal 1200px agar penggunaan RAM efisien di Vercel
         if max(original_size) > 1200:
             img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
         
@@ -84,27 +85,28 @@ def remove_watermark():
         mask = gray.point(lambda x: 255 if x > 230 else 0, mode='1')
         
         # 3. PERHALUS MASK (Expansion & Smoothing)
-        # Memperluas mask 5px agar tidak ada sisa garis di tepian
         mask = mask.filter(ImageFilter.MaxFilter(5))
         mask_final = mask.filter(ImageFilter.GaussianBlur(radius=3))
 
         # 4. INPAINTING (Content-Aware Style)
-        # Mengambil tekstur sekitar menggunakan ModeFilter untuk hasil yang lebih alami
+        # Mengambil tekstur sekitar menggunakan ModeFilter untuk hasil alami
         patch = bottom_area.filter(ImageFilter.ModeFilter(size=9))
-        patch = patch.filter(ImageFilter.GaussianBlur(radius=10)) # Smoothing latar belakang
+        patch = patch.filter(ImageFilter.GaussianBlur(radius=10)) 
         
         # Gabungkan area asli dengan patch berdasarkan mask
         clean_bottom = Image.composite(patch, bottom_area, mask_final)
         
-        # Tempel kembali ke gambar utama
+        # Tempel kembali ke gambar utama yang sedang dikompres
         img.paste(clean_bottom, (0, roi_top))
         
-        # Kembalikan ke ukuran asli
+        # --- TAHAP RESTORASI (KEMBALI KE UKURAN ASLI) ---
+        # Mengembalikan dimensi gambar ke ukuran asli sebelum dikirim ke user
         if img.size != original_size:
             img = img.resize(original_size, Image.Resampling.LANCZOS)
 
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95)
+        # Menyimpan dengan kualitas tinggi (95) agar tidak terlihat pecah
+        img.save(img_io, 'JPEG', quality=95, subsampling=0)
         img_io.seek(0)
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
@@ -206,6 +208,7 @@ def chat():
                 
 # Export app
 app = app
+
 
 
 
