@@ -2,9 +2,9 @@ import os
 import io
 import base64
 import requests
-import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
-from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageChops  # Ditambahkan ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
+
 # Path disesuaikan untuk struktur folder Vercel
 app = Flask(__name__, 
             template_folder='../templates', 
@@ -151,24 +151,7 @@ def chat():
     except Exception as e:
         return jsonify({"reply": "Koneksi timeout. Pastikan file tidak terlalu besar dan API Key benar."})
 
-                
 # Export app
 app = app
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
