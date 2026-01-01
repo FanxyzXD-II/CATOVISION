@@ -163,75 +163,36 @@
         </div>
     </div>
 
-    <div id="unwatermark" class="section">
-        <div class="card">
-            <h2 id="u-title">REMOVE WATERMARK AI</h2>
-            <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(56,189,248,0.3);">
-                <p style="font-size: 11px; color: var(--accent); margin: 0;">✨ <b>Auto-Scan:</b> Automatically detects Gemini logo and text in the bottom area.</p>
-            </div>
+<div id="unwatermark" class="section">
+    <div class="card">
+        <h2>Watermark Remover AI</h2>
+        <div id="wmFormContainer">
             <form id="wmForm">
-                <input type="file" id="wmInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
-                <button type="submit" id="wmBtn" class="send-btn" style="width:100%; padding:15px; background: #f43f5e; color: white;">Process & Erase</button>
+                <div style="border: 2px dashed var(--accent); padding: 30px; border-radius: 20px; margin-bottom: 20px;">
+                    <input type="file" id="wmInput" accept="image/*" required style="width:100%; color:#fff;">
+                </div>
+                <button type="submit" id="wmBtn" class="send-btn" style="width:100%; background: var(--accent); color:#000;">Hapus Watermark Otomatis</button>
             </form>
-            <div id="wmLoading" style="display:none; color:#f43f5e; margin: 15px 0;">Menghapus watermark secara otomatis...</div>
-            <div id="wmResultContainer" style="display:none; margin-top:20px;">
-                <img id="imgWmResult" style="width:100%; border-radius:12px; border:1px solid var(--border); margin-bottom: 10px;">
-                <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #22d3ee; color: white;">Download</button>
-                <button onclick="location.reload()" class="send-btn" style="width:100%; background: #10b981; color: white;">Hapus</button>
-            </div>
+        </div>
+
+        <div id="wmLoading" style="display:none; padding: 20px;">
+            <div class="spinner" style="width:40px; height:40px; border:4px solid rgba(56,189,248,0.1); border-top:4px solid var(--accent); border-radius:50%; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div>
+            <p style="color: var(--accent);"><b>Memproses Gambar...</b></p>
+            <p style="font-size: 11px;">CATOVISION AI sedang menghapus objek secara halus.</p>
+        </div>
+
+        <div id="wmResultContainer" style="display:none; margin-top:20px;">
+            <img id="imgWmResult" style="width:100%; border-radius:15px; border:1px solid var(--border);">
+            <button id="downloadWmBtn" class="send-btn" style="width:100%; margin-top:10px; background: #10b981; color:white;">Unduh HD</button>
+            <button onclick="location.reload()" class="send-btn" style="width:100%; margin-top:10px; background: #ef4444; color:white;">Hapus Lagi</button>
         </div>
     </div>
 </div>
-  <script>
-// Masukkan di dalam tag <script> yang sudah ada, di atas Blockchain Data
-const wmForm = document.getElementById('wmForm');
-const wmInput = document.getElementById('wmInput');
 
-if (wmForm) {
-    wmForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const loading = document.getElementById('wmLoading');
-        const resultCont = document.getElementById('wmResultContainer');
-        const wmBtn = document.getElementById('wmBtn');
-        const imgResult = document.getElementById('imgWmResult');
+<style>
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 
-        if (!wmInput.files[0]) return;
-
-        // Reset Tampilan
-        loading.style.display = 'block';
-        loading.innerHTML = "✨ <b>CATOVISION AI</b> sedang menghapus watermark...";
-        wmBtn.style.display = 'none';
-        resultCont.style.display = 'none';
-
-        const fd = new FormData();
-        fd.append('photo', wmInput.files[0]); 
-
-        try {
-            const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
-            if (res.ok) {
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                
-                imgResult.src = url;
-                loading.style.display = 'none';
-                resultCont.style.display = 'block';
-                
-                // Trigger download otomatis jika diperlukan
-                document.getElementById('downloadWmBtn').onclick = () => {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = "CATOVISION_CLEAN.jpg";
-                    a.click();
-                };
-            } else { throw new Error(); }
-        } catch (err) {
-            alert("Gagal memproses. Gunakan foto dengan kualitas lebih baik.");
-            loading.style.display = 'none';
-            wmBtn.style.display = 'block';
-        }
-    };
-}
-  </script>
   <script>
 // --- BLOCKCHAIN DATA ---
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
@@ -463,6 +424,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
 
 
