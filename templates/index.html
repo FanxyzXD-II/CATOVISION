@@ -183,43 +183,55 @@
     </div>
 </div>
   <script>
-  const wmForm = document.getElementById('wmForm');
-wmForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const loading = document.getElementById('wmLoading');
-    const resultCont = document.getElementById('wmResultContainer');
-    const wmBtn = document.getElementById('wmBtn');
-    const fileInput = document.getElementById('wmInput');
-    
-    if (!fileInput.files[0]) return;
+// Masukkan di dalam tag <script> yang sudah ada, di atas Blockchain Data
+const wmForm = document.getElementById('wmForm');
+const wmInput = document.getElementById('wmInput');
 
-    loading.style.display = 'block';
-    wmBtn.style.display = 'none';
+if (wmForm) {
+    wmForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const loading = document.getElementById('wmLoading');
+        const resultCont = document.getElementById('wmResultContainer');
+        const wmBtn = document.getElementById('wmBtn');
+        const imgResult = document.getElementById('imgWmResult');
 
-    const fd = new FormData();
-    // Kunci 'photo' harus sama dengan request.files.get('photo') di Python
-    fd.append('photo', fileInput.files[0]); 
+        if (!wmInput.files[0]) return;
 
-    try {
-        const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
-        if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            document.getElementById('imgWmResult').src = url;
+        // Reset Tampilan
+        loading.style.display = 'block';
+        loading.innerHTML = "✨ <b>CATOVISION AI</b> sedang menghapus watermark...";
+        wmBtn.style.display = 'none';
+        resultCont.style.display = 'none';
+
+        const fd = new FormData();
+        fd.append('photo', wmInput.files[0]); 
+
+        try {
+            const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
+            if (res.ok) {
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                
+                imgResult.src = url;
+                loading.style.display = 'none';
+                resultCont.style.display = 'block';
+                
+                // Trigger download otomatis jika diperlukan
+                document.getElementById('downloadWmBtn').onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "CATOVISION_CLEAN.jpg";
+                    a.click();
+                };
+            } else { throw new Error(); }
+        } catch (err) {
+            alert("Gagal memproses. Gunakan foto dengan kualitas lebih baik.");
             loading.style.display = 'none';
-            resultCont.style.display = 'block';
-        } else {
-            const errData = await res.json();
-            throw new Error(errData.error || "Gagal");
+            wmBtn.style.display = 'block';
         }
-    } catch (err) {
-        alert("Gagal memproses: " + err.message);
-        loading.style.display = 'none';
-        wmBtn.style.display = 'block';
-    }
-};
-  
-  <script>
+    };
+}
+
 // --- BLOCKCHAIN DATA ---
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
 const CONTRACT_ADDR = "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9";
@@ -245,7 +257,8 @@ async function updateBlockchainData() {
 }
 updateBlockchainData();
 setInterval(updateBlockchainData, 60000);
-
+  </script>
+  
 // --- MULTI LANGUAGE ---
 const i18n = {
     id: {
@@ -449,6 +462,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
 
 
