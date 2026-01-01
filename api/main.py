@@ -4,7 +4,7 @@ import base64
 import requests
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
-from PIL import Image, ImageOps, ImageEnhance, ImageFilter  # Ditambahkan ImageFilter
+from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageChops  # Ditambahkan ImageFilter
 # Path disesuaikan untuk struktur folder Vercel
 app = Flask(__name__, 
             template_folder='../templates', 
@@ -61,48 +61,54 @@ def enhance_photo():
                 
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
-    # Gunakan 'photo' karena ini yang dikirim oleh JavaScript Anda
-    file = request.files.get('photo') 
-    if not file:
-        return jsonify({"error": "File tidak ditemukan dalam request"}), 400
-    
+    if 'photo' not in request.files:
+        return jsonify({"error": "No file"}), 400
     try:
+        file = request.files['photo']
         img = Image.open(file.stream).convert("RGB")
-        
-        # Memory Guard: Mengecilkan gambar agar tidak crash di RAM Vercel
         original_size = img.size
+        
+        # Batasi resolusi untuk performa serverless
         if max(original_size) > 1200:
             img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
         
         width, height = img.size
         
-        # Fokus deteksi pada 25% area bawah (lokasi logo Gemini)
-        roi_top = int(height * 0.75)
+        # 1. ROI: Fokus 20% area bawah (lokasi logo Gemini/AI)
+        roi_top = int(height * 0.80)
         bottom_area = img.crop((0, roi_top, width, height))
         
-        # Masking otomatis untuk pixel sangat terang (>235)
-        mask = bottom_area.convert("L").point(lambda x: 255 if x > 235 else 0, mode='1')
-        mask = mask.filter(ImageFilter.MaxFilter(5)) # Pertebal mask
+        # 2. DETEKSI LOGO (Auto-Masking)
+        # Mencari pixel terang (teks/logo Gemini biasanya putih/abu terang)
+        gray = bottom_area.convert("L")
+        mask = gray.point(lambda x: 255 if x > 230 else 0, mode='1')
         
-        # Inpainting sederhana menggunakan blur
-        blurred_patch = bottom_area.filter(ImageFilter.GaussianBlur(radius=15))
-        clean_bottom = Image.composite(blurred_patch, bottom_area, mask)
+        # 3. PERHALUS MASK (Expansion & Smoothing)
+        # Memperluas mask 5px agar tidak ada sisa garis di tepian
+        mask = mask.filter(ImageFilter.MaxFilter(5))
+        mask_final = mask.filter(ImageFilter.GaussianBlur(radius=3))
+
+        # 4. INPAINTING (Content-Aware Style)
+        # Mengambil tekstur sekitar menggunakan ModeFilter untuk hasil yang lebih alami
+        patch = bottom_area.filter(ImageFilter.ModeFilter(size=9))
+        patch = patch.filter(ImageFilter.GaussianBlur(radius=10)) # Smoothing latar belakang
         
+        # Gabungkan area asli dengan patch berdasarkan mask
+        clean_bottom = Image.composite(patch, bottom_area, mask_final)
+        
+        # Tempel kembali ke gambar utama
         img.paste(clean_bottom, (0, roi_top))
         
-        # Kembalikan ke ukuran asli sebelum dikirim
+        # Kembalikan ke ukuran asli
         if img.size != original_size:
             img = img.resize(original_size, Image.Resampling.LANCZOS)
 
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=85)
+        img.save(img_io, 'JPEG', quality=95)
         img_io.seek(0)
-        
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
-        # Cetak error ke log Vercel untuk diagnosa lebih lanjut
-        print(f"Error proses WM: {str(e)}")
-        return jsonify({"error": "Gagal mengolah gambar"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/chat", methods=["POST"])
@@ -200,6 +206,7 @@ def chat():
                 
 # Export app
 app = app
+
 
 
 
