@@ -79,7 +79,7 @@
     <a href="#" id="m-home" class="active" onclick="navTo('home')">Home</a>
     <a href="#" id="m-ai" onclick="navTo('ai')">AI Analyst</a>
     <a href="#" id="m-clear" onclick="navTo('clear')">AI Enhancer</a>
-    <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">AI Unwatermark</a>
+    <a href="#" id="m-unwatermark" onclick="navTo('unwatermark')">Remove WaterMark AI</a>
 </nav>
 
 <div class="container">
@@ -135,7 +135,7 @@
 
     <div id="clear" class="section">
         <div class="card">
-            <h2 id="e-title">✨ AI Photo Enhancer</h2>
+            <h2 id="e-title">Photo Enhancer AI</h2>
             <form id="enhanceForm">
                 <input type="file" id="photoInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
                 <button type="submit" id="processBtn" class="send-btn" style="width:100%; padding:15px;">Continue</button>
@@ -165,9 +165,9 @@
 
     <div id="unwatermark" class="section">
         <div class="card">
-            <h2 id="u-title">🚫 AI Watermark Remover</h2>
+            <h2 id="u-title">REMOVE WATERMARK AI</h2>
             <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(56,189,248,0.3);">
-                <p style="font-size: 11px; color: var(--accent); margin: 0;">✨ <b>Auto-Scan:</b> Mendeteksi otomatis logo Gemini dan teks di area bawah.</p>
+                <p style="font-size: 11px; color: var(--accent); margin: 0;">✨ <b>Auto-Scan:</b> Automatically detects Gemini logo and text in the bottom area.</p>
             </div>
             <form id="wmForm">
                 <input type="file" id="wmInput" name="photo" accept="image/*" required style="margin-bottom:20px; width:100%; color:#fff;">
@@ -176,14 +176,51 @@
             <div id="wmLoading" style="display:none; color:#f43f5e; margin: 15px 0;">Menghapus watermark secara otomatis...</div>
             <div id="wmResultContainer" style="display:none; margin-top:20px;">
                 <img id="imgWmResult" style="width:100%; border-radius:12px; border:1px solid var(--border); margin-bottom: 10px;">
-                <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #10b981; color: white;">Download Result</button>
-                <button onclick="location.reload()" class="send-btn" style="width:100%; background: #475569; color: white;">Reset</button>
+                <button id="downloadWmBtn" class="send-btn" style="width:100%; background: #22d3ee; color: white;">Download</button>
+                <button onclick="location.reload()" class="send-btn" style="width:100%; background: #10b981; color: white;">Hapus</button>
             </div>
         </div>
     </div>
 </div>
+  <script>
+  const wmForm = document.getElementById('wmForm');
+wmForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const loading = document.getElementById('wmLoading');
+    const resultCont = document.getElementById('wmResultContainer');
+    const wmBtn = document.getElementById('wmBtn');
+    const fileInput = document.getElementById('wmInput');
+    
+    if (!fileInput.files[0]) return;
 
-<script>
+    loading.style.display = 'block';
+    wmBtn.style.display = 'none';
+
+    const fd = new FormData();
+    // Kunci 'photo' harus sama dengan request.files.get('photo') di Python
+    fd.append('photo', fileInput.files[0]); 
+
+    try {
+        const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            document.getElementById('imgWmResult').src = url;
+            loading.style.display = 'none';
+            resultCont.style.display = 'block';
+        } else {
+            const errData = await res.json();
+            throw new Error(errData.error || "Gagal");
+        }
+    } catch (err) {
+        alert("Gagal memproses: " + err.message);
+        loading.style.display = 'none';
+        wmBtn.style.display = 'block';
+    }
+};
+  </script>
+
+  <script>
 // --- BLOCKCHAIN DATA ---
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
 const CONTRACT_ADDR = "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9";
@@ -221,7 +258,7 @@ const i18n = {
         u_title: "🚫 Hapus Watermark AI",
         send: "Kirim", loading: "Menganalisis...",
         q1: "📊Analisa BTC", q2: "🎯 Sinyal SOL",
-        m_home: "Beranda", m_ai: "Analisis AI", m_clear: "Penjernih AI", m_unwatermark: "Hapus Watermark"
+        m_home: "Beranda", m_ai: "Analisis AI", m_clear: "Penjernih AI", m_unwatermark: "Remove WaterMark AI"
     },
     en: {
         h_desc: "First meme coin on Paxi L1 with AI utility",
@@ -232,7 +269,7 @@ const i18n = {
         u_title: "🚫 AI Watermark Remover",
         send: "Send", loading: "Analyzing...",
         q1: "📊 BTC Analysis", q2: "🎯 SOL Signal",
-        m_home: "Home", m_ai: "AI Analyst", m_clear: "AI Enhancer", m_unwatermark: "Unwatermark"
+        m_home: "Home", m_ai: "AI Analyst", m_clear: "AI Enhancer", m_unwatermark: "Remove Watermark AI"
     },
     zh: {
         h_desc: "Paxi L1 上首个具备 AI 实用工具的模因币",
@@ -243,7 +280,7 @@ const i18n = {
         u_title: "🚫 AI 水印移除",
         send: "发送", loading: "分析中...",
         q1: "📊 BTC 分析", q2: "🎯 SOL 信号",
-        m_home: "首页", m_ai: "AI 分析", m_clear: "AI照片增强", m_unwatermark: "移除水印"
+        m_home: "首页", m_ai: "AI 分析", m_clear: "AI照片增强", m_unwatermark: "移除水印 AI"
     }
 };
 
@@ -413,4 +450,5 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
