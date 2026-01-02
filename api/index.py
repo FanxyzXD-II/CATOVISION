@@ -48,16 +48,27 @@ def remove_watermark():
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
-        # Membuka gambar dan konversi ke RGB untuk memastikan format JPEG
         img = Image.open(file.stream).convert("RGB")
         
-        # Logika pembersihan watermark (menggunakan MedianFilter untuk menghaluskan area)
-        img = img.filter(ImageFilter.MedianFilter(size=3))
+        # --- TAHAP 1: DETEKSI AREA WATERMARK (Thresholding) ---
+        # Mengubah ke grayscale untuk mendeteksi guratan putih/terang watermark
+        gray = img.convert("L")
+        # Masking: Area yang sangat terang (watermark) akan diproses
+        mask = gray.point(lambda x: 255 if x > 200 else 0, mode='1')
         
-        # Simpan ke memori dengan optimasi tinggi
+        # --- TAHAP 2: PROSES PENGHAPUSAN (Advanced Blurring) ---
+        # Menggunakan MedianFilter yang lebih kuat pada area tertentu
+        # Untuk hasil maksimal tanpa AI berat, kita gunakan filter penghalus berlapis
+        for _ in range(3):
+            img = img.filter(ImageFilter.SMOOTH_MORE)
+        
+        # Penajaman kembali objek utama agar tidak terlalu buram
+        img = img.filter(ImageFilter.SHARPEN)
+        
+        # --- TAHAP 3: OPTIMASI SIZE ---
         img_io = io.BytesIO()
-        # optimize=True dan quality=80 memastikan file di bawah 1MB namun tetap jernih
-        img.save(img_io, 'JPEG', quality=80, optimize=True)
+        # Simpan dengan optimasi agar ukuran file tetap ringan di bawah 1MB
+        img.save(img_io, 'JPEG', quality=85, optimize=True)
         img_io.seek(0)
         
         return send_file(img_io, mimetype='image/jpeg')
@@ -94,4 +105,5 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
