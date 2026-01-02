@@ -387,18 +387,28 @@ enhanceForm.onsubmit = async (e) => {
 };
 document.getElementById('resetBtn').onclick = () => { location.reload(); };
 
-// --- UNWATERMARK LOGIC ---
+// --- UNWATERMARK LOGIC DENGAN KOMPRESI ---
 const wmForm = document.getElementById('wmForm');
+
 wmForm.onsubmit = async (e) => {
     e.preventDefault();
     const loading = document.getElementById('wmLoading');
     const resultCont = document.getElementById('wmResultContainer');
     const wmBtn = document.getElementById('wmBtn');
+    const fileInput = document.getElementById('wmInput');
+
+    if (!fileInput.files[0]) return;
+
     loading.style.display = 'block';
     wmBtn.style.display = 'none';
-    const fd = new FormData();
-    fd.append('photo', document.getElementById('wmInput').files[0]);
+
     try {
+        // Proses Kompresi di Sisi Browser (Client) agar < 1MB
+        const compressedFile = await compressImage(fileInput.files[0]);
+
+        const fd = new FormData();
+        fd.append('photo', compressedFile);
+
         const res = await fetch('/remove-watermark', { method: 'POST', body: fd });
         if (res.ok) {
             const blob = await res.blob();
@@ -410,8 +420,45 @@ wmForm.onsubmit = async (e) => {
                 const a = document.createElement('a'); a.href = url; a.download = "CLEAN.jpg"; a.click();
             };
         } else { throw new Error(); }
-    } catch { alert("Gagal memproses."); location.reload(); }
+    } catch (err) { 
+        alert("Gagal memproses gambar."); 
+        location.reload(); 
+    }
 };
+
+// Fungsi Helper untuk Kompresi Gambar & Resize Otomatis
+async function compressImage(file) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Batasi dimensi maksimal 1280px untuk menjaga size tetap kecil
+                const MAX_WIDTH = 1280;
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Export ke Blob dengan kualitas 0.7 (70%) agar pasti di bawah 1MB
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                }, 'image/jpeg', 0.7);
+            };
+        };
+    });
+}
 
 changeLang('id', document.querySelector('.lang-btn'));
 </script>
@@ -421,4 +468,5 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
