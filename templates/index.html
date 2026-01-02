@@ -86,10 +86,10 @@
     <div id="home" class="section active">
         <div class="card">
             <img src="/static/uploads/100003748.jpg" class="logo-caton">
-            <h1>$CATON</h1>
+            <h1>$CAI</h1>
             <p id="h-desc">Meme coin pertama di Paxi L1 dengan utilitas AI</p>
             <div style="font-size: 10px; color: #64748b; margin-bottom: 5px; font-weight: bold;">CONTRACT ADDRESS</div>
-            <div class="ca-box" onclick="copyCA()">paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9</div>
+            <div class="ca-box" onclick="copyCA()">SOON..</div>
             <div class="stats-row">
                 <div class="stat-card">
                     <span class="stat-label" id="l-supply">Total Supply</span>
@@ -100,7 +100,7 @@
                     <span class="stat-val" id="val-holders">Loading...</span>
                 </div>
             </div>
-            <a href="https://t.me/+Vr2EQmXy66w0YzM1" target="_blank" class="btn-tg" id="h-btn">Join Telegram Group</a>
+            <a href="https://t.me/" target="_blank" class="btn-tg" id="h-btn">Join Telegram Group</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             {% for cat in cats %}
@@ -193,7 +193,7 @@
   <script>
 // --- BLOCKCHAIN DATA ---
 const PAXI_REST_API = "https://winscan.winsnip.xyz/paxi-mainnet"; 
-const CONTRACT_ADDR = "paxi1vgd3f2z0kt2ldlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9";
+const CONTRACT_ADDR = "-";
 
 async function updateBlockchainData() {
     try {
@@ -210,8 +210,8 @@ async function updateBlockchainData() {
             }
         }
     } catch (error) {
-        document.getElementById('val-supply').innerText = "1,000,000,000";
-        document.getElementById('val-holders').innerText = "45"; 
+        document.getElementById('val-supply').innerText = "BONDING CURVE";
+        document.getElementById('val-holders').innerText = "LOADING..."; 
     }
 }
 updateBlockchainData();
@@ -267,7 +267,7 @@ function navTo(id) {
 }
 
 function copyCA() {
-    navigator.clipboard.writeText("paxi1vgd3f2z0kt21dlk2pum0pqyshy50dqzgtxrr2pzu3lgy029awjkstqqmg9");
+    navigator.clipboard.writeText("SOON");
     alert("CA Copied!");
 }
 
@@ -421,3 +421,4 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
