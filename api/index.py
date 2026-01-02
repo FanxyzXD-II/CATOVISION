@@ -21,82 +21,64 @@ def index():
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
-@app.route("/remove-watermark", methods=["POST"])
-def remove_watermark():
+# --- 1. LOGIKA AI ENHANCER (Route: /enhance) ---
+@app.route("/enhance", methods=["POST"])
+def enhance_photo():
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
-        
-    # Ambil API Token dari Environment Variable Vercel
-    # Daftar di PixelBin untuk mendapatkan Cloud Name dan API Token
-    PIXELBIN_TOKEN = os.environ.get("PIXELBIN_TOKEN")
-    CLOUD_NAME = "Rian" # Ganti dengan Cloud Name Anda
-
     try:
         file = request.files['photo']
-        img_bytes = file.read()
+        img = Image.open(file.stream).convert("RGB")
 
-        # URL Endpoint PixelBin untuk Plugin Erase (Object Removal)
-        # Format: https://api.pixelbin.io/v1/upload/direct
-        url = "https://api.pixelbin.io/v1/upload/direct"
+        # Tahap 1: Anti-Noise & Smoothing
+        img = img.filter(ImageFilter.SMOOTH_MORE)
         
-        # Parameter untuk menghapus objek secara otomatis (af_remove)
-        # Sesuai dokumentasi PixelBin isolateFlow=true
-        params = {
-            "plugin": "af_remove",
-            "isolateFlow": "true"
-        }
+        # Tahap 2: Ultra Sharpening (Efek HD)
+        # Menggunakan UnsharpMask untuk detail mikro yang tajam
+        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=350, threshold=1))
+        
+        # Tahap 3: Final Enhancement
+        img = ImageEnhance.Contrast(img).enhance(1.25)
+        img = ImageEnhance.Color(img).enhance(1.15)
+        img = ImageEnhance.Sharpness(img).enhance(2.0)
 
-        headers = {
-            "Authorization": f"Bearer {PIXELBIN_TOKEN}"
-        }
-
-        files = {
-            "file": (file.filename, img_bytes, file.content_type)
-        }
-
-        response = requests.post(url, headers=headers, files=files, params=params, timeout=40)
-
-        if response.status_code == 200:
-            # PixelBin biasanya mengembalikan URL gambar yang sudah diproses
-            data = response.json()
-            processed_url = data.get("url")
-            
-            # Ambil konten gambar dari URL hasil proses
-            img_res = requests.get(processed_url)
-            
-            return send_file(
-                io.BytesIO(img_res.content),
-                mimetype='image/jpeg'
-            )
-        else:
-            return f"PixelBin Error: {response.text}", 500
-
+        img_io = io.BytesIO()
+        img.save(img_io, 'JPEG', quality=100, subsampling=0)
+        img_io.seek(0)
+        return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
         return f"Error: {str(e)}", 500
 
-
+# --- 2. LOGIKA AI WATERMARK REMOVER (Route: /remove-watermark) ---
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
-        file_bytes = np.frombuffer(file.read(), np.uint8)
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        img = Image.open(file.stream).convert("RGB")
 
-        # 1. Buat Mask (mendeteksi area putih/terang seperti coretan di foto Anda)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)
-
-        # 2. Inpaint (Menambal area mask)
-        # cv2.INPAINT_TELEA atau cv2.INPAINT_NS
-        dst = cv2.inpaint(img, mask, 3, cv2.INPAINT_TELEA)
-
-        # Simpan kembali
-        _, buffer = cv2.imencode('.jpg', dst, [cv2.IMWRITE_JPEG_QUALITY, 85])
-        img_io = io.BytesIO(buffer)
-        img_io.seek(0)
+        # Algoritma Content-Aware Blur (Pillow Version)
+        # 1. Deteksi area watermark (Highlights detection)
+        gray = img.convert("L")
+        mask = gray.point(lambda x: 255 if x > 230 else 0, mode='1')
         
+        # 2. Ekspansi Mask agar menutupi tepi tulisan/objek
+        mask = mask.convert("L").filter(ImageFilter.MaxFilter(5))
+        mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
+        
+        # 3. Membuat tekstur penambal (Blur background)
+        blurred_patch = img.filter(ImageFilter.GaussianBlur(radius=12))
+        
+        # 4. Komposisi: Timpa watermark dengan tekstur blur berdasarkan mask
+        img_result = Image.composite(blurred_patch, img, mask)
+
+        # Sedikit sharpening agar area yang dihapus tidak terlalu mencolok
+        img_result = ImageEnhance.Sharpness(img_result).enhance(1.5)
+
+        img_io = io.BytesIO()
+        img_result.save(img_io, 'JPEG', quality=95)
+        img_io.seek(0)
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
         return f"Error: {str(e)}", 500
@@ -131,6 +113,7 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
 
 
