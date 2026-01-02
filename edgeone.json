@@ -1,20 +1,19 @@
 {
-  "version": 1,
-  "routes": [
+  "version": 2,
+  "builds": [
     {
-      "pattern": "/static/(.*)",
-      "target": "/static/$1",
-      "type": "static"
-    },
-    {
-      "pattern": "/(.*)",
-      "target": "/api/main.py",
-      "type": "function"
+      "src": "api/index.py",
+      "use": "@vercel/python"
     }
   ],
-  "function_config": {
-    "runtime": "python3",
-    "memory": 1024,
-    "timeout": 60
-  }
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
+    }
+  ]
 }
