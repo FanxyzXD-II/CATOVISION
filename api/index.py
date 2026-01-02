@@ -21,36 +21,55 @@ def index():
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
-
-@app.route("/enhance", methods=["POST"])
-def enhance_photo():
+@app.route("/remove-watermark", methods=["POST"])
+def remove_watermark():
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
-    
-    # Ambil API Token dari Environment Variable Vercel (Disarankan)
-    # Atau ganti langsung dengan token Anda sementara untuk testing
-    VYRO_API_TOKEN = os.environ.get("VYRO_API_TOKEN", "YOUR_ACTUAL_TOKEN_HERE")
+        
+    # Ambil API Token dari Environment Variable Vercel
+    # Daftar di PixelBin untuk mendapatkan Cloud Name dan API Token
+    PIXELBIN_TOKEN = os.environ.get("PIXELBIN_TOKEN")
+    CLOUD_NAME = "Rian" # Ganti dengan Cloud Name Anda
 
     try:
         file = request.files['photo']
         img_bytes = file.read()
 
-        # Panggilan API ke Vyro.ai
-        response = requests.post(
-            'https://api.vyro.ai/v2/image/enhance',
-            headers={'Authorization': f'Bearer {VYRO_API_TOKEN}'},
-            files={'image': (file.filename, img_bytes, file.content_type)},
-            timeout=30
-        )
+        # URL Endpoint PixelBin untuk Plugin Erase (Object Removal)
+        # Format: https://api.pixelbin.io/v1/upload/direct
+        url = "https://api.pixelbin.io/v1/upload/direct"
+        
+        # Parameter untuk menghapus objek secara otomatis (af_remove)
+        # Sesuai dokumentasi PixelBin isolateFlow=true
+        params = {
+            "plugin": "af_remove",
+            "isolateFlow": "true"
+        }
+
+        headers = {
+            "Authorization": f"Bearer {PIXELBIN_TOKEN}"
+        }
+
+        files = {
+            "file": (file.filename, img_bytes, file.content_type)
+        }
+
+        response = requests.post(url, headers=headers, files=files, params=params, timeout=40)
 
         if response.status_code == 200:
-            # Mengirimkan file gambar hasil proses AI kembali ke user
+            # PixelBin biasanya mengembalikan URL gambar yang sudah diproses
+            data = response.json()
+            processed_url = data.get("url")
+            
+            # Ambil konten gambar dari URL hasil proses
+            img_res = requests.get(processed_url)
+            
             return send_file(
-                io.BytesIO(response.content),
+                io.BytesIO(img_res.content),
                 mimetype='image/jpeg'
             )
         else:
-            return f"API Error ({response.status_code}): {response.text}", 500
+            return f"PixelBin Error: {response.text}", 500
 
     except Exception as e:
         return f"Error: {str(e)}", 500
@@ -112,6 +131,7 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
 
 
