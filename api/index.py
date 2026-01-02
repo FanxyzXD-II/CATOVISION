@@ -105,5 +105,5 @@ def chat():
         return jsonify({"reply": "Koneksi AI timeout."})
 
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
-def handler(environ, start_response):
-    return app(environ, start_response)
+# WAJIB: Ekspos objek app untuk Vercel
+app = app
