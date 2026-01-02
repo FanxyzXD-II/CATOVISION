@@ -49,48 +49,28 @@ def enhance_photo():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
-# --- 2. LOGIKA AI WATERMARK REMOVER (Route: /remove-watermark) ---
-@app.route("/remove-watermark", methods=["POST"])
-def remove_watermark():
-    if 'photo' not in request.files:
-        return "File tidak ditemukan", 400
-    try:
-        file = request.files['photo']
-        img = Image.open(file.stream).convert("RGB")
 
-        # Algoritma Content-Aware Blur (Pillow Version)
-        # 1. Deteksi area watermark (Highlights detection)
-        gray = img.convert("L")
-        mask = gray.point(lambda x: 255 if x > 230 else 0, mode='1')
-        
-        # 2. Ekspansi Mask agar menutupi tepi tulisan/objek
-        mask = mask.convert("L").filter(ImageFilter.MaxFilter(5))
-        mask = mask.filter(ImageFilter.GaussianBlur(radius=2))
-        
-        # 3. Membuat tekstur penambal (Blur background)
-        blurred_patch = img.filter(ImageFilter.GaussianBlur(radius=12))
-        
-        # 4. Komposisi: Timpa watermark dengan tekstur blur berdasarkan mask
-        img_result = Image.composite(blurred_patch, img, mask)
-
-        # Sedikit sharpening agar area yang dihapus tidak terlalu mencolok
-        img_result = ImageEnhance.Sharpness(img_result).enhance(1.5)
-
-        img_io = io.BytesIO()
-        img_result.save(img_io, 'JPEG', quality=95)
-        img_io.seek(0)
-        return send_file(img_io, mimetype='image/jpeg')
-    except Exception as e:
-        return f"Error: {str(e)}", 500
-
+# --- 3. AI ANALYST (IDENTITAS CATOVISION AI) ---
 @app.route("/chat", methods=["POST"])
 def chat():
     user_query = request.form.get('query', '')
     lang = request.form.get('lang', 'id')
     image_file = request.files.get('image')
-    if not GROQ_API_KEY:
-        return jsonify({"reply": "API Key Groq tidak ditemukan."})
     
+    if not GROQ_API_KEY:
+        return jsonify({"reply": "Sistem CATOVISION AI sedang dalam pemeliharaan."})
+    
+    # Instruksi Sistem untuk Menghapus Jejak Model Pihak Ketiga
+    system_instruction = (
+        f"Anda adalah CATOVISION AI, asisten cerdas yang dikembangkan sepenuhnya oleh tim teknis CATOVISION. "
+        f"Berikan jawaban dalam bahasa {lang}. "
+        "\n\nATURAN MUTLAK:"
+        "\n1. Dilarang menyebutkan nama model AI lain seperti Llama, Meta, Groq, atau OpenAI."
+        "\n2. Identitas Anda hanya satu: CATOVISION AI."
+        "\n3. Jawablah semua pertanyaan (umum, teknis, atau harian) dengan gaya profesional, membantu, dan cerdas."
+        "\n4. Jika ditanya mengenai asal-usul, jawablah bahwa Anda adalah produk kecerdasan buatan dari ekosistem CATOVISION."
+    )
+
     content_list = [{"type": "text", "text": user_query}]
     if image_file:
         img = Image.open(image_file).convert("RGB")
@@ -104,19 +84,20 @@ def chat():
         response = requests.post(
             "https://api.groq.com/openai/v1/chat/completions", 
             headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, 
-            json={"model": "meta-llama/llama-4-scout-17b-16e-instruct", "messages": [{"role": "user", "content": content_list}]}
+            json={
+                "model": "meta-llama/llama-4-scout-17b-16e-instruct", 
+                "messages": [
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": content_list}
+                ],
+                "temperature": 0.4 # Menjaga agar tetap patuh pada identitas sistem
+            },
+            timeout=25
         )
         return jsonify({"reply": response.json()['choices'][0]['message']['content']})
     except:
-        return jsonify({"reply": "Koneksi AI timeout."})
+        return jsonify({"reply": "CATOVISION AI sedang melakukan sinkronisasi data."})
 
-# WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
-# WAJIB: Ekspos objek app untuk Vercel
 app = app
-
-
-
-
-
 
 
