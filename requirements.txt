@@ -5,5 +5,5 @@ yt-dlp==2025.01.26
 anyio==4.12.0
 httpx==0.28.1
 python-telegram-bot==22.5
-opencv-python-headless
+opencv-python
 numpy
