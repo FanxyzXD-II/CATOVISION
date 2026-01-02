@@ -8,8 +8,8 @@ from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageChops
 
 # Path disesuaikan untuk struktur folder Vercel
 app = Flask(__name__, 
-            template_folder='../templates', 
-            static_folder='../static')
+            template_folder='../templates'), 
+            static_folder='../static'),
 
 # API Key Groq dari Environment Variable Vercel
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
@@ -144,3 +144,4 @@ def chat():
 
 # Export app
 app = app
+
