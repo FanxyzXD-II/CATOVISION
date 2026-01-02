@@ -2,7 +2,6 @@ import os
 import io
 import base64
 import requests
-import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageChops
@@ -100,6 +99,7 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
 
 
