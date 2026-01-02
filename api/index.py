@@ -2,6 +2,7 @@ import os
 import io
 import base64
 import requests
+import cv2
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageChops
@@ -42,33 +43,27 @@ def enhance_photo():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
+
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
-        img = Image.open(file.stream).convert("RGB")
-        
-        # --- TAHAP 1: DETEKSI AREA WATERMARK (Thresholding) ---
-        # Mengubah ke grayscale untuk mendeteksi guratan putih/terang watermark
-        gray = img.convert("L")
-        # Masking: Area yang sangat terang (watermark) akan diproses
-        mask = gray.point(lambda x: 255 if x > 200 else 0, mode='1')
-        
-        # --- TAHAP 2: PROSES PENGHAPUSAN (Advanced Blurring) ---
-        # Menggunakan MedianFilter yang lebih kuat pada area tertentu
-        # Untuk hasil maksimal tanpa AI berat, kita gunakan filter penghalus berlapis
-        for _ in range(3):
-            img = img.filter(ImageFilter.SMOOTH_MORE)
-        
-        # Penajaman kembali objek utama agar tidak terlalu buram
-        img = img.filter(ImageFilter.SHARPEN)
-        
-        # --- TAHAP 3: OPTIMASI SIZE ---
-        img_io = io.BytesIO()
-        # Simpan dengan optimasi agar ukuran file tetap ringan di bawah 1MB
-        img.save(img_io, 'JPEG', quality=85, optimize=True)
+        file_bytes = np.frombuffer(file.read(), np.uint8)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+        # 1. Buat Mask (mendeteksi area putih/terang seperti coretan di foto Anda)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY)
+
+        # 2. Inpaint (Menambal area mask)
+        # cv2.INPAINT_TELEA atau cv2.INPAINT_NS
+        dst = cv2.inpaint(img, mask, 3, cv2.INPAINT_TELEA)
+
+        # Simpan kembali
+        _, buffer = cv2.imencode('.jpg', dst, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        img_io = io.BytesIO(buffer)
         img_io.seek(0)
         
         return send_file(img_io, mimetype='image/jpeg')
@@ -105,5 +100,6 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
 
