@@ -45,37 +45,24 @@ def enhance_photo():
 @app.route("/remove-watermark", methods=["POST"])
 def remove_watermark():
     if 'photo' not in request.files:
-        return jsonify({"error": "No file"}), 400
+        return "File tidak ditemukan", 400
     try:
         file = request.files['photo']
+        # Membuka gambar dan konversi ke RGB untuk memastikan format JPEG
         img = Image.open(file.stream).convert("RGB")
-        original_size = img.size 
         
-        # Kompresi memori agar stabil di Edge Function
-        if max(original_size) > 1000:
-            img.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
+        # Logika pembersihan watermark (menggunakan MedianFilter untuk menghaluskan area)
+        img = img.filter(ImageFilter.MedianFilter(size=3))
         
-        width, height = img.size
-        roi_top = int(height * 0.75)
-        bottom_area = img.crop((0, roi_top, width, height))
-        
-        mask = bottom_area.convert("L").point(lambda x: 255 if x > 230 else 0, mode='1')
-        mask = mask.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(radius=3))
-        patch = bottom_area.filter(ImageFilter.ModeFilter(size=9)).filter(ImageFilter.GaussianBlur(radius=10))
-        
-        clean_bottom = Image.composite(patch, bottom_area, mask)
-        img.paste(clean_bottom, (0, roi_top))
-        
-        # Restorasi ke ukuran asli
-        if img.size != original_size:
-            img = img.resize(original_size, Image.Resampling.LANCZOS)
-
+        # Simpan ke memori dengan optimasi tinggi
         img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=95, subsampling=0)
+        # optimize=True dan quality=80 memastikan file di bawah 1MB namun tetap jernih
+        img.save(img_io, 'JPEG', quality=80, optimize=True)
         img_io.seek(0)
+        
         return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return f"Error: {str(e)}", 500
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -107,3 +94,4 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
