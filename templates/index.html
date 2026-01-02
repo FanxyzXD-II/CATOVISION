@@ -143,16 +143,16 @@
             <div id="loading" style="display:none; color:#38bdf8; margin: 15px 0;">please wait...</div>
 <div id="comparisonContainer" style="display:none; margin-top:20px; position:relative; width:100%; overflow:hidden; border-radius:12px; border:2px solid #334155; line-height: 0; background:#000;">
     
-    <span id="labelBefore" style="position:absolute; left:10px; bottom:10px; background:rgba(0,0,0,0.5); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:10; font-weight:bold; pointer-events:none; transition: opacity 0.2s;">Before</span>
+    <span id="labelBefore" style="position:absolute; left:10px; bottom:10px; background:rgba(0,0,0,0.5); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:10; font-weight:bold; pointer-events:none; transition: opacity 0.3s;">Before</span>
     
     <img id="imgBeforeStatic" style="width:100%; height:auto; display:block; object-fit: contain;">
     
-    <div id="imgAfterWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2;">
-        <span id="labelAfter" style="position:absolute; right:10px; bottom:10px; background:rgba(56,189,248,0.7); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:1; font-weight:bold; pointer-events:none; transition: opacity 0.2s;">After</span>
+    <div id="imgAfterWrapper" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:3px solid #fff; z-index:2; transition: border-color 0.3s;">
+        <span id="labelAfter" style="position:absolute; right:10px; bottom:10px; background:rgba(56,189,248,0.7); color:#fff; padding:4px 10px; border-radius:4px; font-size:12px; z-index:1; font-weight:bold; pointer-events:none; transition: opacity 0.3s;">After</span>
         <img id="imgAfter" style="position:absolute; top:0; left:0; object-fit: contain; object-position: left center;">
     </div>
 
-    <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+    <div id="sliderHandle" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:44px; height:44px; background:#fff; border-radius:50%; border:3px solid #38bdf8; z-index:31; pointer-events:none; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: opacity 0.3s;">
         <div style="display:flex; gap:3px;">
             <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 8px solid #38bdf8;"></div>
             <div style="width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #38bdf8;"></div>
@@ -351,44 +351,45 @@ async function askAI() {
 function setQuery(v) { document.getElementById('userQuery').value = v; askAI(); }
 
 // --- ENHANCER LOGIC ---
-const labelBefore = document.getElementById('labelBefore');
 const slider = document.getElementById('slider');
 const wrapper = document.getElementById('imgAfterWrapper');
 const handle = document.getElementById('sliderHandle');
 const labelBefore = document.getElementById('labelBefore');
 const labelAfter = document.getElementById('labelAfter');
-const imgAfter = document.getElementById('imgAfter');
-const imgBeforeStatic = document.getElementById('imgBeforeStatic');
 
 slider.oninput = function() {
-    let val = this.value; // Ambil nilai 0 - 100
+    let val = parseInt(this.value);
     let valPersen = val + "%";
     
-    // 1. Geser posisi pemisah gambar dan handle bulat
+    // Perbarui posisi gambar After dan Handle
     wrapper.style.width = valPersen;
     handle.style.left = valPersen;
 
-    // 2. Logika Opacity Label (Sesuai Permintaan Anda)
-    // val / 20 membuat tulisan cepat hilang saat digeser sedikit dari ujung
+    // --- LOGIKA HILANGKAN TULISAN & GARIS ---
     
-    // Tulisan "Before" hilang saat slider digeser ke kiri (mendekati 0)
-    let opBefore = val / 20; 
-    labelBefore.style.opacity = opBefore > 1 ? 1 : opBefore;
+    // 1. Hilangkan garis (border-right) dan handle bulat jika di ujung
+    if (val <= 2 || val >= 98) {
+        handle.style.opacity = "0";
+        wrapper.style.borderRightColor = "transparent";
+    } else {
+        handle.style.opacity = "1";
+        wrapper.style.borderRightColor = "#fff";
+    }
 
-    // Tulisan "After" hilang saat slider digeser ke kanan (mendekati 100)
-    let opAfter = (100 - val) / 20;
-    labelAfter.style.opacity = opAfter > 1 ? 1 : opAfter;
+    // 2. Hilangkan tulisan Before (saat geser ke kiri/0)
+    if (val <= 15) {
+        labelBefore.style.opacity = "0";
+    } else {
+        labelBefore.style.opacity = "1";
+    }
+
+    // 3. Hilangkan tulisan After (saat geser ke kanan/100)
+    if (val >= 85) {
+        labelAfter.style.opacity = "0";
+    } else {
+        labelAfter.style.opacity = "1";
+    }
 };
-
-// Fungsi tambahan agar ukuran gambar 'After' selalu sinkron dengan 'Before'
-function syncImageSize() {
-    imgAfter.style.width = imgBeforeStatic.clientWidth + "px";
-    imgAfter.style.height = imgBeforeStatic.clientHeight + "px";
-}
-
-// Panggil sync saat window di-resize
-window.onresize = syncImageSize;
-
 
 enhanceForm.onsubmit = async (e) => {
     e.preventDefault();
@@ -501,6 +502,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
 
 
