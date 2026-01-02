@@ -352,24 +352,42 @@ function setQuery(v) { document.getElementById('userQuery').value = v; askAI(); 
 
 // --- ENHANCER LOGIC ---
 const labelBefore = document.getElementById('labelBefore');
+const slider = document.getElementById('slider');
+const wrapper = document.getElementById('imgAfterWrapper');
+const handle = document.getElementById('sliderHandle');
+const labelBefore = document.getElementById('labelBefore');
 const labelAfter = document.getElementById('labelAfter');
+const imgAfter = document.getElementById('imgAfter');
+const imgBeforeStatic = document.getElementById('imgBeforeStatic');
 
 slider.oninput = function() {
-    let val = this.value; // Nilai 0 - 100
+    let val = this.value; // Ambil nilai 0 - 100
     let valPersen = val + "%";
     
-    // Geser pembatas gambar
+    // 1. Geser posisi pemisah gambar dan handle bulat
     wrapper.style.width = valPersen;
     handle.style.left = valPersen;
 
-    // --- LOGIKA HILANGKAN TULISAN ---
-    // Saat digeser ke kiri (mendekati 0), tulisan "Before" memudar
-    // Kita gunakan skala 0.0 - 1.0 untuk opacity
-    labelBefore.style.opacity = val / 50; 
+    // 2. Logika Opacity Label (Sesuai Permintaan Anda)
+    // val / 20 membuat tulisan cepat hilang saat digeser sedikit dari ujung
+    
+    // Tulisan "Before" hilang saat slider digeser ke kiri (mendekati 0)
+    let opBefore = val / 20; 
+    labelBefore.style.opacity = opBefore > 1 ? 1 : opBefore;
 
-    // Saat digeser ke kanan (mendekati 100), tulisan "After" memudar
-    labelAfter.style.opacity = (100 - val) / 50;
+    // Tulisan "After" hilang saat slider digeser ke kanan (mendekati 100)
+    let opAfter = (100 - val) / 20;
+    labelAfter.style.opacity = opAfter > 1 ? 1 : opAfter;
 };
+
+// Fungsi tambahan agar ukuran gambar 'After' selalu sinkron dengan 'Before'
+function syncImageSize() {
+    imgAfter.style.width = imgBeforeStatic.clientWidth + "px";
+    imgAfter.style.height = imgBeforeStatic.clientHeight + "px";
+}
+
+// Panggil sync saat window di-resize
+window.onresize = syncImageSize;
 
 
 enhanceForm.onsubmit = async (e) => {
@@ -483,6 +501,7 @@ changeLang('id', document.querySelector('.lang-btn'));
 </style>
 </body>
 </html>
+
 
 
 
