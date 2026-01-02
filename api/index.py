@@ -21,24 +21,37 @@ def index():
     ]
     return render_template("index.html", cats=koleksi_kucing)
 
+
 @app.route("/enhance", methods=["POST"])
 def enhance_photo():
     if 'photo' not in request.files:
         return "File tidak ditemukan", 400
+    
+    # Ambil API Token dari Environment Variable Vercel (Disarankan)
+    # Atau ganti langsung dengan token Anda sementara untuk testing
+    VYRO_API_TOKEN = os.environ.get("VYRO_API_TOKEN", "YOUR_ACTUAL_TOKEN_HERE")
+
     try:
         file = request.files['photo']
-        img = Image.open(file.stream).convert("RGB")
-        for _ in range(2):
-            img = img.filter(ImageFilter.SMOOTH_MORE)
-        img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=400, threshold=1))
-        img = img.filter(ImageFilter.DETAIL)
-        img = ImageEnhance.Contrast(img).enhance(1.3)
-        img = ImageEnhance.Sharpness(img).enhance(2.5)
-        img = ImageEnhance.Color(img).enhance(1.1)
-        img_io = io.BytesIO()
-        img.save(img_io, 'JPEG', quality=100, subsampling=0)
-        img_io.seek(0)
-        return send_file(img_io, mimetype='image/jpeg')
+        img_bytes = file.read()
+
+        # Panggilan API ke Vyro.ai
+        response = requests.post(
+            'https://api.vyro.ai/v2/image/enhance',
+            headers={'Authorization': f'Bearer {VYRO_API_TOKEN}'},
+            files={'image': (file.filename, img_bytes, file.content_type)},
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            # Mengirimkan file gambar hasil proses AI kembali ke user
+            return send_file(
+                io.BytesIO(response.content),
+                mimetype='image/jpeg'
+            )
+        else:
+            return f"API Error ({response.status_code}): {response.text}", 500
+
     except Exception as e:
         return f"Error: {str(e)}", 500
 
@@ -99,6 +112,7 @@ def chat():
 # WAJIB UNTUK TENCENT CLOUD EDGEONE: WSGI Entry Point
 # WAJIB: Ekspos objek app untuk Vercel
 app = app
+
 
 
 
